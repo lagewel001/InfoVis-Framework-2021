@@ -9,7 +9,7 @@ import sys
 import torch
 import wikipedia
 import urllib.request
-import random 
+import random
 
 
 from base64 import encodebytes
@@ -159,6 +159,7 @@ def get_line_chart_artist(model_data, label):
 
     series.append({
         # 'styles': styles,
+        'type': 'scatter',
         'text': label,
         'values': values,
     })
@@ -197,6 +198,24 @@ def encode_image(image, format='png'):
 def collect_line_chart(data):
     data = get_line_chart_artist(model_data, data['artist'])
     print("Collecting line chart data", data)
+
+    values = data['series'][0]['values']
+    x, y = zip(*values)
+    weights = np.polyfit(x, y, 3)
+    model = np.poly1d(weights)
+    trend_x = np.linspace(min(x), max(x), 20)
+    trend_y = model(trend_x)
+    print(list(zip(trend_x, trend_y)))
+    data['series'].append({
+        'values':list(zip(trend_x, trend_y)),
+        'type': 'line',
+        'aspect': 'spline',
+        'marker': {'visible': False},
+        'line-width': 1,
+        'line-style': "solid",
+        'line-color': "black",
+    })
+
     socketio.emit("collect_line_chart", data)
 
 
@@ -220,7 +239,7 @@ def get_image(class_idx, class_type):
         # print(model_data.loc[model_data['artist_last_name'] == class_idx])
         data = model_data.loc[model_data['artist_last_name'] == class_idx]
         nr = random.randint(0, len(data)-1)
-        data = data.iloc[nr] 
+        data = data.iloc[nr]
         image_url = data['image_url']
         title = data['artwork_name']
         artist = class_idx
@@ -392,7 +411,6 @@ def get_all_artists():
 @socketio.event
 def get_artist_histograms(data):
     artists = data['artists']
-    print(artists)
     histograms = _get_artist_histograms(artists)
     socketio.emit("get_style_hists", {
         "series": [{

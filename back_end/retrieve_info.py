@@ -64,8 +64,6 @@ def _get_artist_histograms(artists=None):
 
         hist, edges = np.histogram(hues, bins=11, range=(0, 1), density=True)
 
-        print(hues, hist)
-
         x_values = [
             0.5 * (first + second)
             for first, second in zip(edges[:-1], edges[1:])

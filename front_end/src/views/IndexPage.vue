@@ -5,17 +5,17 @@ from data import *;
       <!-- <div v-if="!chosen"> -->
 
         <!-- <vs-col type="flex" vs-justify="left" vs-align="left" vs-w="7"> -->
-           
+
           <vs-row vs-justify="top">
 
-            <vs-col type="flex" vs-justify="left" vs-align="left" vs-w="8">  
+            <vs-col type="flex" vs-justify="left" vs-align="left" vs-w="8">
 
               <!-- <div v-if="fetched.img_existend"> -->
                 <vs-col type="flex" vs-justify="left" vs-align="left" vs-w="6">
-                  
+
                   <transition mode="out-in" enter-active-class="animate__animated animate__fadeInLeft" leave-active-class="animate__animated animate__fadeOutRight">
                     <vs-card class="cardx" v-if="fetched.img_existend" fixedHeight vs-w="5">
-                      <div slot="header"><h3>Existend Art Piece: {{exist_title}}, {{exist_artist}}, {{exist_year}}</h3></div>
+                      <div slot="header"><h3>Existing Art Piece: {{exist_title}}, {{exist_artist}}, {{exist_year}}</h3></div>
 
                           <div slot="media">
                               <img v-bind:src="existend_img">
@@ -23,7 +23,7 @@ from data import *;
                     </vs-card>
                   </transition>
                 </vs-col>
-                  
+
                 <vs-col type="flex" vs-justify="right" vs-align="right" vs-w="6">
                   <transition mode="out-in" enter-active-class="animate__animated animate__fadeInDown" leave-active-class="animate__animated animate__fadeOutUp">
                     <vs-card class="cardx" v-if="fetched.img_generated" fixedHeight vs-w="5">
@@ -40,12 +40,12 @@ from data import *;
 
             </vs-col>
 
-            <vs-col type="flex" vs-justify="right" vs-align="right" vs-w="4">  
+            <vs-col type="flex" vs-justify="right" vs-align="right" vs-w="4">
 
               <vs-row vs-justify='top'>
 
-                <vs-col type="flex" vs-justify="right" vs-align="right" vs-w="6">  
-                
+                <vs-col type="flex" vs-justify="right" vs-align="right" vs-w="6">
+
                 <transition mode="out-in" enter-active-class="animate__animated animate__fadeInRight" leave-active-class="animate__animated animate__fadeOutLeft">
                   <vs-card class="cardx" v-if="fetched.col_generated">
                     <div slot="header"><h4>Dominant colors in this painting</h4></div>
@@ -64,8 +64,8 @@ from data import *;
 
             </vs-col>
 
-                <vs-col type="flex" vs-justify="right" vs-align="right" vs-w="6">  
-                    
+                <vs-col type="flex" vs-justify="right" vs-align="right" vs-w="6">
+
                     <transition mode="out-in" enter-active-class="animate__animated animate__fadeInRight" leave-active-class="animate__animated animate__fadeOutLeft">
 
                       <vs-card class="cardx" v-if="fetched.summary">
@@ -76,12 +76,12 @@ from data import *;
                       </vs-card>
 
                     </transition>
-                
+
                 </vs-col>
 
               </vs-row>
 
-                
+
 
               <vs-row vs-justify='bottom'>
 
@@ -97,7 +97,7 @@ from data import *;
               </transition>
 
               </vs-row>
-            
+
             </vs-col>
 
 
@@ -105,7 +105,7 @@ from data import *;
 
           </vs-row>
 
-            
+
 
 
           <vs-row vs-justify="bottom">
@@ -113,7 +113,7 @@ from data import *;
           <vs-col type="flex" vs-justify="left" vs-align="left" :vs-w="time_line_size">
 
             <transition name="slide-fade">
-            
+
               <vs-card class="cardx">
                 <div slot="header">
                     <h3>Pick a <span v-if="fetched.img_generated">new</span> style!</h3>
@@ -203,7 +203,7 @@ from data import *;
 
               <vs-col type="flex" vs-justify="right" vs-align="right" vs-w="6">
 
-    
+
               <transition mode="out-in" enter-active-class="animate__animated animate__fadeInRight" leave-active-class="animate__animated animate__fadeOutLeft">
               <vs-card class="cardx" v-if="fetched.line_chart" >
                 <div slot="header"><h3>Dominant colors over the years: {{selected_artist}}</h3></div>
@@ -222,21 +222,21 @@ from data import *;
             </transition>
 
             </vs-col>
-            
+
 
 
           </vs-col>
           </vs-row>
           <!-- </vs-row> -->
 
-          
+
         <!-- </vs-col> -->
       <!-- </div>  -->
 
 
-        
- 
-           
+
+
+
 
 
 
@@ -293,7 +293,7 @@ export default {
       exist_year: '',
       exist_artist: '',
       line_chart_data: {
-        type: 'scatter',
+        type: 'mixed',
         plot: {
           // aspect: "spline",
           tooltip: {
@@ -306,7 +306,7 @@ export default {
           animation: {
             effect: 1,
             sequence: 3,
-            speed: 10,
+            speed: 20,
           }
         },
         scaleX: {
@@ -419,7 +419,7 @@ export default {
     // 'overdrive': VOverdrive
   },
   methods: {
-    
+
     handleNodeHighlight(e) {
       this.lastVisited = `Node: ${e.nodeindex} Value: ${e.value}`;
     },
@@ -484,7 +484,7 @@ export default {
               // this.get_info(this.selected_artist)
 
               this.genre = filter
-              
+
               this.$parent.socket.emit("collect_info", {
                 type: "artists",
                 amount: 1,
@@ -671,14 +671,14 @@ export default {
 
     this.$parent.socket.on("images_generated", (data) => {
       console.log("Received generated image", data);
-      // this.generated_img = data.images[0].image;
-      this.generated_img = "@/assets/images/big/img1.jpg";
+      this.generated_img = data.images[0].image;
+      // this.generated_img = "@/assets/images/big/img1.jpg";
       this.fetched.img_generated = true;
     });
 
     window.addEventListener("resize", () => {
         this.timeline.width(document.getElementById('timeline').clientWidth);
-        this.timeline.width(document.getElementById('timeline2').clientWidth);
+        // this.timeline.width(document.getElementById('timeline2').clientWidth);
     })
 
     window.addEventListener("load", () => {
@@ -688,7 +688,7 @@ export default {
         });
     });
   }
-  
+
 }
 
 // .fade-enter-active, .fade-leave-active {
