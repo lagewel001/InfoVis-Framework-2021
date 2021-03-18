@@ -108,27 +108,6 @@ def get_artists(model_data):
     return all_artist_text
 
 
-def get_line_chart(model_data):
-    line_graph = {}
-
-    a = model_data['creation_year'].tolist()
-    b = model_data['dominant_color'].tolist()
-    labels = model_data['school'].tolist()
-
-    for i, artist in enumerate(labels):
-        if artist not in line_graph.keys():
-            line_graph[artist] = []
-        line_graph[artist].append([a[i], b[i]])
-
-    serie = []
-    for artist in line_graph.keys():
-        serie.append({
-            'values': line_graph[artist],
-            'text': artist
-        })
-    return serie
-
-
 def get_line_chart_artist(model_data, label):
     """
     Collect data for the school/dominant color linechart.
@@ -192,27 +171,32 @@ def encode_image(image, format='png'):
 @socketio.event
 def collect_line_chart(data):
     data = get_line_chart_artist(model_data, data['artist'])
-    print("Collecting line chart data", data)
 
-    values = data['series'][0]['values']
-    x, y = zip(*values)
-    weights = np.polyfit(x, y, 3)
-    model = np.poly1d(weights)
-    trend_x = np.linspace(min(x), max(x), 20)
-    trend_y = model(trend_x)
-    print(list(zip(trend_x, trend_y)))
-    data['series'].append({
-        'values':list(zip(trend_x, trend_y)),
-        'type': 'line',
-        'aspect': 'spline',
-        'marker': {'visible': False},
-        'line-width': 1,
-        'line-style': "solid",
-        'line-color': "black",
-    })
+    # Fit a polynomial to the data.
+    trendlines = []
+
+    for series in data['series']:
+        x, y = zip(*series['values'])
+        weights = np.polyfit(x, y, 3)
+        model = np.poly1d(weights)
+
+        trend_x = np.linspace(min(x), max(x), 20)
+        trend_y = model(trend_x)
+
+        trendlines.append({
+            'text': f"{series['text']} trend",
+            'values':list(zip(trend_x, trend_y)),
+            'type': 'line',
+            'aspect': 'spline',
+            'marker': {'visible': False},
+            'line-width': 2,
+            'line-style': "dashed",
+            'line-color': "black",
+        })
+
+    data['series'] += trendlines
 
     socketio.emit("collect_line_chart", data)
-
 
 
 def get_image(class_idx, class_type):
@@ -302,10 +286,6 @@ def collect_info(data):
     socketio.emit("set_selected_artist", {
         "artist_options": get_artists(model_data),
     })
-
-    # socketio.emit("line_chart", {
-    #     "series": get_line_chart(model_data),
-    # })
 
     '''
     histograms = get_artist_histograms()
