@@ -7,6 +7,7 @@ import torch
 import wikipedia
 import urllib.request
 import random
+import json
 
 from base64 import encodebytes
 from colour import Color
@@ -199,12 +200,22 @@ def collect_line_chart(data):
     socketio.emit("collect_line_chart", data)
 
 
+# def decode(encoded_img):
+#     return f"data:image/png;base64, {encoded_img}"
+
+
 def get_image(class_idx, class_type):
     # print('helloo')
     # print(model_data[:10])
     if class_type == "centuries":
-        print('**********')
-        data = model_data.loc[model_data['creation_year'] == class_idx][0]['image_url']
+        data = model_data.loc[model_data['creation_year'] == class_idx]
+        urls = data['image_url'].tolist()
+        # urls = list(map(decode, urls))
+        image_list = urls
+        # image_list = json.dumps({"image_urls": urls,
+        # "titles": data['artwork_name'],
+        # "year": data['creation_year']
+        # })
         nr = random.randint(0, len(data)-1)
         data = data['image_url'].iloc[nr]
         # data = model_data['creation_year' == class_idx][0]
@@ -214,9 +225,15 @@ def get_image(class_idx, class_type):
         artist = data['artist_last_name']
 
     elif class_type == "artists":
-        print('**********')
         # print(model_data.loc[model_data['artist_last_name'] == class_idx])
         data = model_data.loc[model_data['artist_last_name'] == class_idx]
+        urls = data['image_url'].tolist()
+        # urls = list(map(decode, urls))
+        image_list = urls
+        # image_list = json.dumps({"image_urls": urls,
+        # "titles": data['artwork_name'],
+        # "year": data['creation_year']
+        # })
         nr = random.randint(0, len(data)-1)
         data = data.iloc[nr]
         image_url = data['image_url']
@@ -224,8 +241,10 @@ def get_image(class_idx, class_type):
         artist = class_idx
         year = data['creation_year']
 
+
+
         # data = model_data['artist_full_name' == class_idx][0]
-    return image_url, title, artist, year
+    return image_list, image_url, title, artist, year
 
 
 
@@ -244,7 +263,7 @@ def collect_info(data):
     #     "Cubism": "img3.jpg",
     #     "Surrealism": "img4.jpg",
     # }.get(gen, "img1.jpg")
-    image, title, artist, year = get_image(class_idx, class_type)
+    image_list, image, title, artist, year = get_image(class_idx, class_type)
     # print(image)
 
     # path = os.path.join(os.path.dirname(__file__), image_file)
@@ -259,6 +278,7 @@ def collect_info(data):
 
     socketio.emit("set_image", {
         "existend": f"data:image/png;base64, {encoded_img}",
+        "existend_imgs": image_list,
         "title": title,
         "artist": artist,
         "year": year

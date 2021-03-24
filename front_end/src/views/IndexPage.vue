@@ -11,7 +11,7 @@ from data import *;
             <vs-col type="flex" vs-justify="left" vs-align="left" vs-w="8">
 
               <!-- <div v-if="fetched.img_existend"> -->
-                <vs-col type="flex" vs-justify="left" vs-align="left" vs-w="6">
+                <!-- <vs-col type="flex" vs-justify="left" vs-align="left" vs-w="6">
 
                   <transition mode="out-in" enter-active-class="animate__animated animate__fadeInLeft" leave-active-class="animate__animated animate__fadeOutRight">
                     <vs-card class="cardx" v-if="fetched.img_existend" fixedHeight vs-w="5">
@@ -22,9 +22,49 @@ from data import *;
                           </div>
                     </vs-card>
                   </transition>
+                </vs-col> -->
+
+                <vs-col type="flex" vs-justify="left" vs-align="left" vs-w="6">
+
+                  <transition mode="out-in" enter-active-class="animate__animated animate__fadeInLeft" leave-active-class="animate__animated animate__fadeOutRight">
+                    <vs-card class="cardx" v-if="fetched.img_existend" fixedHeight vs-w="5">
+                      <!-- <div slot="header"><h3>Existend Art Piece: {{exist_title}}, {{exist_artist}}, {{exist_year}}</h3></div> -->
+                      <div slot="header"><h3>Existend Art Pieces: {{exist_artist}}</h3></div>
+
+                          <div slot="media">
+
+
+                              <carousel-3d>
+
+                              <!-- <slide v-for="img in existend_imgs" v-bind:src="img"> </option> -->
+                              <!-- <div > -->
+                                <slide v-for="(slide, i) in existend_imgs" :index="i" :key="i">
+                                  <template slot-scope="{ index, isCurrent, leftIndex, rightIndex }">
+                                    <img :data-index="index" :class="{ current: isCurrent, onLeft: (leftIndex >= 0), onRight: (rightIndex >= 0) }" :src="slide">
+                                  </template>
+                                </slide>
+                              <!-- </div> -->
+                            </carousel-3d>
+                          </div>
+                    </vs-card>
+                  </transition>
                 </vs-col>
 
                 <vs-col type="flex" vs-justify="right" vs-align="right" vs-w="6">
+                 <!-- <vs-card class="cardx" v-if="fetched.img_existend" fixedHeight vs-w="5">
+
+                  <carousel-3d>
+                <slide :index="0">
+                  <img v-bind:src="existend_img">
+                </slide>
+                <slide :index="1">
+                <img v-bind:src="existend_img">
+
+                </slide>
+              </carousel-3d>
+
+                  </vs-card> -->
+
                   <transition mode="out-in" enter-active-class="animate__animated animate__fadeInDown" leave-active-class="animate__animated animate__fadeOutUp">
                     <vs-card class="cardx" v-if="fetched.img_generated" fixedHeight vs-w="5">
                       <div slot="header"><h3>Generated Art Piece</h3></div>
@@ -32,6 +72,16 @@ from data import *;
                           <div slot="media"  v-if="fetched.img_generated">
                               <img v-bind:src="generated_img">
                           </div>
+
+                           <!-- <carousel-3d>
+
+
+                                <slide v-for="(slide, i) in generated_imgs" :index="i" :key="i">
+                                  <template slot-scope="{ index, isCurrent, leftIndex, rightIndex }">
+                                    <img :data-index="index" :class="{ current: isCurrent, onLeft: (leftIndex >= 0), onRight: (rightIndex >= 0) }" :src="slide">
+                                  </template>
+                                </slide>
+                            </carousel-3d> -->
 
                     </vs-card>
                   </transition>
@@ -110,7 +160,7 @@ from data import *;
 
           <vs-row vs-justify="bottom">
 <!-- vs-w="6" -->
-          <vs-col type="flex" vs-justify="left" vs-align="left" :vs-w="time_line_size">
+          <vs-col type="flex" vs-justify="left" vs-align="left" id="timeline-card" :vs-w="time_line_size">
             <transition name="slide-fade">
               <vs-card class="cardx">
                 <div slot="header">
@@ -147,39 +197,15 @@ from data import *;
                 <div class="mt-3" id="timeline">
                     Painting happy little trees...
                 </div>
-                <!-- <div class="d-flex align-items-center dropdownbtn-alignment">
-                  <vs-dropdown vs-trigger-click>
-                    <vs-button
-                      class="btn-alignment"
-                      type="filled"
-                      icon="expand_more"
-                      :color="main_color"
-                    >Pick a style!</vs-button>
-                    <vs-dropdown-menu>
-                      <vs-dropdown-item @click="get_info('Impressionism')">
-                        Impressionism
-                      </vs-dropdown-item>
-                      <vs-dropdown-item @click="get_info('Expressionism (fine arts)')">
-                        Expressionism
-                      </vs-dropdown-item>
-                      <vs-dropdown-item @click="get_info('Cubism')">
-                        Cubism
-                      </vs-dropdown-item>
-                      <vs-dropdown-item @click="get_info('Surrealism')">
-                        Surealism
-                      </vs-dropdown-item>
-                    </vs-dropdown-menu>
-                  </vs-dropdown>
-                </div> -->
               </vs-card>
 
           </transition>
 
           </vs-col>
 
-          <vs-col type="flex" vs-justify="right" vs-align="right" vs-w="6">
+          <!-- <vs-col type="flex" vs-justify="right" vs-align="right" vs-w="5"> -->
 
-            <vs-col type="flex" vs-justify="left" vs-align="left" vs-w="6">
+            <vs-col type="flex" vs-justify="left" vs-align="left" vs-w="3">
 
 
              <transition mode="out-in" enter-active-class="animate__animated animate__fadeInUp" leave-active-class="animate__animated animate__fadeOutDown">
@@ -199,7 +225,7 @@ from data import *;
 
 
 
-              <vs-col type="flex" vs-justify="right" vs-align="right" vs-w="6">
+              <vs-col type="flex" vs-justify="right" vs-align="right" vs-w="3">
 
 
               <transition mode="out-in" enter-active-class="animate__animated animate__fadeInRight" leave-active-class="animate__animated animate__fadeOutLeft">
@@ -221,7 +247,7 @@ from data import *;
 
             </vs-col>
 
-          </vs-col>
+          <!-- </vs-col> -->
           </vs-row>
           <!-- </vs-row> -->
         <!-- </vs-col> -->
@@ -235,11 +261,13 @@ import PieChart from "./PieChart.js";
 /*eslint no-unused-vars: 0*/
 import zingchart from 'zingchart';
 import zingchartVue from 'zingchart-vue';
+import ResizeSensor from 'css-element-queries/src/ResizeSensor';
 import TimelinesChart from "../timeline";
 import 'animate.css';
+import { Carousel3d, Slide } from 'vue-carousel-3d';
+
 // import { VOverdrive } from 'vue-overdrive'
 // import * as easing from 'eases/quart-in-out' // Bring 'yr own easing functions!
-
 
 export default {
   name: 'Index',
@@ -253,14 +281,12 @@ export default {
   },
   data: () => {
     return {
-      time_line_size: "12",
-      // time_line_key: 0,
+      time_line_size: 12,
       artist_options: [],
       genre: 'Hallo',
       selected: 'airstream',
       summary: '',
       related_terms: '',
-      // reload_time_line: false,
       fetched: {
         img_existend: false,
         img_generated: false,
@@ -275,6 +301,8 @@ export default {
       },
       generated_img: "@/assets/images/big/img1.jpg",
       existend_img: "@/assets/images/big/img1.jpg",
+      existend_imgs: [],
+      generated_imgs: [],
       exist_title: '',
       exist_year: '',
       exist_artist: '',
@@ -402,6 +430,8 @@ export default {
   components: {
     PieChart,
     zingchart: zingchartVue,
+    Carousel3d,
+    Slide
     // 'overdrive': VOverdrive
   },
   methods: {
@@ -419,9 +449,9 @@ export default {
     async get_info(genre) {
       // this.$vs.loading();
 
-      this.time_line_size = "6",
+      this.time_line_size = 6;
       // this.time_line_key += 1,
-      this.genre = genre
+      this.genre = genre;
       this.$parent.socket.emit("collect_info", {
         'genre': genre,
         'year': 1993,
@@ -446,6 +476,7 @@ export default {
         .onZoom((a, b) => console.log(a, b))
         .onLegendClick((s) => {
           this.setZoomToFilter();
+          this.setZoomToFilter();d3
           window.setTimeout(() => {
             if (filters.includes(s.innerHTML)) {
               // Deselect clicked filters
@@ -465,6 +496,7 @@ export default {
 
             let zoomStart = null, zoomEnd = null;
             if (filters.length > 0) {
+              this.time_line_size = 6;
               this.$parent.socket.emit("get_artist_histograms", {artists: filters});
               this.$parent.socket.emit("collect_line_chart", {
                 'artist': filters[filters.length - 1],
@@ -617,6 +649,7 @@ export default {
     this.$parent.socket.on("set_image", (data) => {
       window.scroll({top: 0, left: 0, behaviour: 'smooth'});
       this.existend_img = data.existend;
+      this.existend_imgs = data.existend_imgs;
       this.exist_title = data.title;
       this.exist_artist = data.artist;
       this.exist_year = data.year;
@@ -667,9 +700,9 @@ export default {
       this.fetched.img_generated = true;
     });
 
-    window.addEventListener("resize", () => {
+    new ResizeSensor(document.getElementById('timeline-card'), () => {
         this.timeline.width(document.getElementById('timeline').clientWidth);
-    })
+    });
 
     window.addEventListener("load", () => {
         this.$parent.socket.emit('get_timeline_data', (data) => {
@@ -678,7 +711,6 @@ export default {
         });
     });
   }
-
 }
 
 // .fade-enter-active, .fade-leave-active {
@@ -708,10 +740,16 @@ export default {
   height: 80px;
   background-color: skyblue;
 } */
-
+/*
 .scale{
     zoom: 0.75;
     -moz-transform: scale(0.75);
+} */
+
+
+.scale{
+    zoom: 0.6;
+    -moz-transform: scale(0.6);
 }
 
 </style>
