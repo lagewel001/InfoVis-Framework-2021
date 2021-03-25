@@ -211,7 +211,7 @@ from data import *;
              <transition mode="out-in" enter-active-class="animate__animated animate__fadeInUp" leave-active-class="animate__animated animate__fadeOutDown">
 
                   <vs-card class="cardx" v-if="fetched.histograms">
-                    <div slot="header"><h3>Usage of dominant colors: {{selected_artist}}</h3></div>
+                    <div slot="header"><h3>Distribution of dominant colors: {{selected_artist}}</h3></div>
                     <zingchart
                     ref="style_hist"
                     :data="style_hist_data"
@@ -309,19 +309,13 @@ export default {
       line_chart_data: {
         type: 'mixed',
         plot: {
-          // aspect: "spline",
           tooltip: {
-            text: "artist: %t \n year: %kt"
+            text: "%t\nHue: %v\nYear: %kt"
           },
           marker: {
             visible: true,
             style: ["#fff", "#aaa", "#000"],
           },
-          animation: {
-            effect: 1,
-            sequence: 3,
-            speed: 20,
-          }
         },
         scaleX: {
           label: {
@@ -332,6 +326,9 @@ export default {
           label: {
             "text": "Hue",
           },
+          minValue: 0.0,
+          maxValue: 1.0,
+          step: 0.1,
         },
         series: [
         ],
@@ -354,9 +351,9 @@ export default {
         ]
       },
       style_hist_data: {
-        type: 'area',
+        type: 'hbar',
         plot: {
-          aspect: "spline",
+          aspect: "histogram",
           marker: {
             visible: false,
           },
@@ -366,12 +363,23 @@ export default {
             speed: 10,
           },
         },
+        plotarea: {
+          "adjust-layout": true,
+        },
         scaleX: {
           label: {
             "text": "Hue",
           },
+          item: {
+            offsetY: 0.05,
+          },
+          labels: [
+            '0.0-0.1', '0.1-0.2', '0.2-0.3', '0.3-0.4', '0.4-0.5',
+            '0.5-0.6', '0.6-0.7', '0.7-0.8', '0.8-0.9', '0.9-1.0',
+          ],
         },
         scaleY: {
+          // values: "0:1",
           label: {
             "text": "Density",
           },
@@ -382,6 +390,7 @@ export default {
           {values: [2, 3, 4, 3, 2, 3, 4, 2, 1]},
         ],
         legend: {},
+        /*
         labels: [
           {
             // text: "Test",
@@ -397,6 +406,7 @@ export default {
             fillAngle: 0,
           }
         ],
+        */
       },
       chart_key: 0,
       pie_key: 0,
@@ -437,13 +447,6 @@ export default {
   methods: {
     handleNodeHighlight(e) {
       this.lastVisited = `Node: ${e.nodeindex} Value: ${e.value}`;
-    },
-
-    async get_line_graph() {
-      var artist = this.selected;
-      this.$parent.socket.emit("collect_line_chart", {
-        'artist': artist,
-      });
     },
 
     async get_info(genre) {
@@ -499,7 +502,7 @@ export default {
               this.time_line_size = 6;
               this.$parent.socket.emit("get_artist_histograms", {artists: filters});
               this.$parent.socket.emit("collect_line_chart", {
-                'artist': filters[filters.length - 1],
+                labels: filters,
               });
               this.selected_artist = filters;
 
@@ -746,10 +749,9 @@ export default {
     -moz-transform: scale(0.75);
 } */
 
-
 .scale{
-    zoom: 0.6;
-    -moz-transform: scale(0.6);
+    zoom: 1.0;
+    -moz-transform: scale(1.0);
 }
 
 </style>

@@ -36,7 +36,6 @@ if torch.cuda.is_available():
 NUM_CLUSTERS = 4
 RESIZE = 150  # Size of images for clustering.
 
-
 app = Flask(__name__)
 CORS(app)
 socketio = SocketIO(app, cors_allowed_origins='*')
@@ -118,7 +117,9 @@ def get_line_chart_artist(model_data, label):
     data = model_data[model_data.artist_last_name == label]
     data = data[['creation_year', 'dominant_color']]
     data = data.sort_values(by='creation_year')
-    data['hue'] = [Color(color).hue for color in data.dominant_color]
+    data['hue'] = [Color(color).hue for color in data.dominant_color.dropna()]
+    hues = data['hue']
+    print("Scatter", len(hues), sorted(hues)[-5:])
 
     values = []
     styles = []
@@ -126,31 +127,21 @@ def get_line_chart_artist(model_data, label):
     # For years with more than one work that year, we take the average
     # hue of all the dominant colors in that year.
     for year in data.creation_year.unique():
-        hue = data[data.creation_year == year].hue.mean()
+        hue = data[data.creation_year == year].hue.median()
         color = Color(hue=hue, saturation=1, luminance=0.5)
 
         values.append((int(eval(year)), hue))
         styles.append(color.hex)
 
-    series.append({
+    series = {
         # 'styles': styles,
         'type': 'scatter',
         'text': label,
         'values': values,
-    })
-
-    data = {
-        'series': series,
-        'plot': {
-            'marker': {
-                'styles': [
-                    {'background-color': color} for color in styles
-                ],
-            },
-        },
+        'marker': {'size': 3},
     }
 
-    return data
+    return series
 
 
 def encode_image(image, format='png'):
@@ -171,37 +162,44 @@ def encode_image(image, format='png'):
 
 @socketio.event
 def collect_line_chart(data):
-    data = get_line_chart_artist(model_data, data['artist'])
-
-    # Fit a polynomial to the data.
-    trendlines = []
-
-    for series in data['series']:
-        x, y = zip(*series['values'])
+    def get_trendline(values):
+        """Fit a polynomial to the data."""
+        x, y = zip(*values)
         weights = np.polyfit(x, y, 3)
         model = np.poly1d(weights)
 
         trend_x = np.linspace(min(x), max(x), 20)
         trend_y = model(trend_x)
 
-        trendlines.append({
-            'text': f"{series['text']} trend",
+        return trend_x, trend_y
+
+    output = {
+        'plot': {
+            'marker': {},
+        },
+        'series': [],
+    }
+
+    for artist in data['labels']:
+        scatter = get_line_chart_artist(model_data, artist)
+
+        trend_x, trend_y = get_trendline(scatter['values'])
+
+        trendline = {
+            'text': f"{artist} trend",
             'values':list(zip(trend_x, trend_y)),
             'type': 'line',
             'aspect': 'spline',
             'marker': {'visible': False},
             'line-width': 2,
-            'line-style': "dashed",
-            'line-color': "black",
-        })
+            # 'line-style': "dashed",
+            # 'line-color': "black",
+        }
 
-    data['series'] += trendlines
+        output['series'].append(scatter)
+        output['series'].append(trendline)
 
-    socketio.emit("collect_line_chart", data)
-
-
-# def decode(encoded_img):
-#     return f"data:image/png;base64, {encoded_img}"
+    socketio.emit("collect_line_chart", output)
 
 
 def get_image(class_idx, class_type):
@@ -247,7 +245,6 @@ def get_image(class_idx, class_type):
     return image_list, image_url, title, artist, year
 
 
-
 @socketio.event
 def collect_info(data):
     # print("Hallo, ik kom hier om dingen volledig in de war te gooien!")
@@ -289,10 +286,12 @@ def collect_info(data):
 
     socketio.emit("change_color", dom_color)
 
+    '''
     socketio.emit("set_color_pie", {
         "colors": colors,
         "percentages": percentages,
     })
+    '''
 
     # model_data = get_model_data()
 
@@ -406,7 +405,7 @@ def get_all_artists():
 @socketio.event
 def get_artist_histograms(data):
     artists = data['artists']
-    histograms = _get_artist_histograms(artists)
+    histograms = _get_artist_histograms(model_data, artists)
     socketio.emit("get_style_hists", {
         "series": [{
             "values": values,

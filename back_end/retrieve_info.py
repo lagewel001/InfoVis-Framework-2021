@@ -40,13 +40,14 @@ def retrieve_info(genre, year):
     return dictionary
 
 
-def _get_artist_histograms(artists=None):
-    if not artists:
-        artists = FEATURED_ARTISTS
+def _get_artist_histograms(model_data, artists=None):
+    assert artists
 
     result = {}
 
     for artist in artists:
+        data = pd.DataFrame()
+
         # Gather all works by this artist.
         works = model_data[model_data.artist_last_name == artist]
         # colors = works.color_pallete.dropna()
@@ -57,18 +58,33 @@ def _get_artist_histograms(artists=None):
         # colors = itertools.chain.from_iterable(
         #     eval(f"[{','.join(colors.values)}]")
         # )
-        hues = [Color(col).hue for col in colors]
+        data['hue'] = [Color(col).hue for col in colors]
+        data['year'] = [int(eval(year)) for year in works.creation_year]
+
+        hues = []
+
+        for year in sorted(data.year.unique()):
+            hues.append(data[data.year == year].hue.median())
 
         if len(hues) == 0:
             continue
 
-        hist, edges = np.histogram(hues, bins=11, range=(0, 1), density=True)
+        print("Histogram", len(hues), sorted(hues)[-5:])
+
+        hist, edges = np.histogram(
+            hues,
+            bins=10,
+            range=(0, 1),
+            density=True,
+        )
 
         x_values = [
-            0.5 * (first + second)
+            f"{first:.1f}-{second:.1f}"
             for first, second in zip(edges[:-1], edges[1:])
         ]
+        print(hist, edges, x_values)
 
-        result[artist] = list(zip(x_values, hist))
+        # result[artist] = list(zip(x_values, hist))
+        result[artist] = list(hist)
 
     return result
