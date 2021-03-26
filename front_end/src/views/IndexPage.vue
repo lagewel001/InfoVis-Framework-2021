@@ -698,8 +698,11 @@ export default {
 
     this.$parent.socket.on("images_generated", (data) => {
       console.log("Received generated image", data);
-      this.generated_img = data.images[0].image;
-      // this.generated_img = "@/assets/images/big/img1.jpg";
+			if (data.success) {
+				this.generated_img = data.images[0].image;
+			} else {
+				this.generated_img = "@/assets/images/big/img1.jpg";
+			}
       this.fetched.img_generated = true;
     });
 
