@@ -1,18 +1,17 @@
 import binascii
-import json
 import numpy as np
-import os
-import pandas as pd
 import pickle
 import scipy
 import sys
 import torch
 import wikipedia
+import urllib.request
+import random 
+import json
 
 from base64 import encodebytes
 from colour import Color
-from io import BytesIO
-from flask import Flask, jsonify
+from flask import Flask
 from flask_cors import CORS
 from flask_socketio import SocketIO
 from io import BytesIO
@@ -21,9 +20,7 @@ from scipy import cluster
 
 from .retrieve_info import retrieve_info, _get_artist_histograms
 from .data import model_data, all_artists, _get_timeline_data
-
-from .GAN import dnnlib
-from .GAN import generate
+from .GAN import dnnlib, generate
 
 sys.path.append("./GAN/")
 
@@ -78,9 +75,9 @@ def detect_colors(image):
     return list(colors), list(percentages), dom_color
 
 
-def retrieve_info(genre, year, model_data):
-    year = float(year)
-    ranges = float(1)
+def retrieve_info(genre):
+    # year = float(year)
+    # ranges = float(1)
     dictionary = {}
 
     w = wikipedia.page(genre)
@@ -90,14 +87,14 @@ def retrieve_info(genre, year, model_data):
 
     # print('artworks in same time period:')
     # other art pieces created in same year
-    year_df = model_data.loc[model_data['creation_year'].astype('float') < year+ranges]
-    year_df = year_df.loc[year_df['creation_year'].astype('float') > year-ranges]
+    # year_df = model_data.loc[model_data['creation_year'].astype('float') < year+ranges]
+    # year_df = year_df.loc[year_df['creation_year'].astype('float') > year-ranges]
 
-    year_list = pd.Series.tolist(year_df['artwork_name'])
-    if len(year_list) < 5:
-        dictionary['same_year/genre'] = pd.Series.tolist(year_df['artwork_name'])
-    else:
-        dictionary['same_year/genre'] = pd.Series.tolist(year_df['artwork_name'])[:5]
+    # year_list = pd.Series.tolist(year_df['artwork_name'])
+    # if len(year_list) < 5:
+    #     dictionary['same_year/genre'] = pd.Series.tolist(year_df['artwork_name'])
+    # else:
+    #     dictionary['same_year/genre'] = pd.Series.tolist(year_df['artwork_name'])[:5]
 
     dictionary['related_terms'] = wikipedia.search(genre)
 
@@ -106,26 +103,8 @@ def retrieve_info(genre, year, model_data):
     return dictionary
 
 
-'''
-def get_model_data():
-    stats_art = pd.read_csv('./data/omniart_v3_datadump.csv')
-    model_data = stats_art.copy()
-    model_data = model_data.drop(model_data[model_data['school'] == 'unknown'].index)
-    model_data = model_data.drop(model_data[model_data['creation_year'] == 'unknown'].index)
-    return model_data
-
-
-model_data = get_model_data()
-'''
-
-
-def stripp(x):
-    return x.strip(' ')
-
-
 def get_artists(model_data):
     all_artist_text = sorted(model_data['school'].astype(str).unique().tolist())
-    # art_list = list(map(stripp, all_artist_text))
 
     return all_artist_text
 
@@ -157,7 +136,7 @@ def get_line_chart_artist(model_data, label):
     """
     series = []
 
-    data = model_data[model_data.school == label]
+    data = model_data[model_data.artist_last_name == label]
     data = data[['creation_year', 'dominant_color']]
     data = data.sort_values(by='creation_year')
     data['hue'] = [Color(color).hue for color in data.dominant_color]
@@ -194,30 +173,98 @@ def get_line_chart_artist(model_data, label):
     return data
 
 
+def encode_image(image, format='png'):
+    """
+    Encode an image into base64 so it can be send along with an event.
+
+    Parameters
+    ----------
+    image: PIL.Image
+    format: str, default 'png'
+    """
+    stream = BytesIO()
+    image.save(stream, format=format)
+    encoded = encodebytes(stream.getvalue()).decode('ascii')
+
+    return f"data:image/{format};base64, {encoded}"
+
+
 @socketio.event
 def collect_line_chart(data):
-    print("Collecting line chart data")
-    socketio.emit(
-        "collect_line_chart",
-        get_line_chart_artist(model_data, data['artist']),
-    )
+    data = get_line_chart_artist(model_data, data['artist'])
+    # print("Collecting line chart data", data)
+    socketio.emit("collect_line_chart", data)
+
+# def decode(encoded_img):
+#     return f"data:image/png;base64, {encoded_img}"
+
+
+def get_image(class_idx, class_type):
+    # print('helloo')
+    # print(model_data[:10])
+    if class_type == "centuries":
+        data = model_data.loc[model_data['creation_year'] == class_idx]  
+        urls = data['image_url'].tolist()[:6]
+        # urls = list(map(decode, urls))
+        image_list = urls
+        # image_list = json.dumps({"image_urls": urls,
+        # "titles": data['artwork_name'],
+        # "year": data['creation_year']
+        # })
+        nr = random.randint(0, len(data)-1)
+        data = data['image_url'].iloc[nr]
+        # data = model_data['creation_year' == class_idx][0]
+        image_url = data['image_url']
+        title = data['artwork_name']
+        year = class_idx
+        artist = data['artist_last_name']
+
+    elif class_type == "artists":
+        # print(model_data.loc[model_data['artist_last_name'] == class_idx])
+        data = model_data.loc[model_data['artist_last_name'] == class_idx]
+        urls = data['image_url'].tolist()[:6]
+        # urls = list(map(decode, urls))
+        image_list = urls
+        # image_list = json.dumps({"image_urls": urls,
+        # "titles": data['artwork_name'],
+        # "year": data['creation_year']
+        # })
+        nr = random.randint(0, len(data)-1)
+        data = data.iloc[nr] 
+        image_url = data['image_url']
+        title = data['artwork_name']
+        artist = class_idx
+        year = data['creation_year']
+            
+        
+
+        # data = model_data['artist_full_name' == class_idx][0]
+    return image_list, image_url, title, artist, year
+
 
 
 @socketio.event
 def collect_info(data):
-    gen = data['genre']
-    y = data['year']
+    # print("Hallo, ik kom hier om dingen volledig in de war te gooien!")
+    class_type = data["type"]
+    amount = data["amount"]
+    class_idx = data["class_idx"]
 
     # Load a placeholder image.
     # TODO: Obtain a generated image here.
-    image_file = {
-        "Impressionism": "img1.jpg",
-        "Expressionism (fine arts)": "img2.jpg",
-        "Cubism": "img3.jpg",
-        "Surrealism": "img4.jpg",
-    }.get(gen, "img1.jpg")
-    path = os.path.join(os.path.dirname(__file__), image_file)
-    image = Image.open(path)
+    # image_file = {
+    #     "Impressionism": "img1.jpg",
+    #     "Expressionism (fine arts)": "img2.jpg",
+    #     "Cubism": "img3.jpg",
+    #     "Surrealism": "img4.jpg",
+    # }.get(gen, "img1.jpg")
+    image_list, image, title, artist, year = get_image(class_idx, class_type)
+    # print(image)
+
+    # path = os.path.join(os.path.dirname(__file__), image_file)
+    # image = Image.open(urllib3.urlopen(image))
+    image = Image.open(urllib.request.urlopen(image))
+
 
     # Encode the image for the response.
     img_stream = BytesIO()
@@ -225,7 +272,11 @@ def collect_info(data):
     encoded_img = encodebytes(img_stream.getvalue()).decode('ascii')
 
     socketio.emit("set_image", {
-        "generated": f"data:image/png;base64, {encoded_img}",
+        "existend": f"data:image/png;base64, {encoded_img}",
+        "existend_imgs": image_list,
+        "title": title,
+        "artist": artist,
+        "year": year
     })
 
     # Get the primary color of the image.
@@ -240,7 +291,7 @@ def collect_info(data):
 
     # model_data = get_model_data()
 
-    dictionary = retrieve_info(gen, y, model_data)
+    dictionary = retrieve_info(class_idx)
 
     socketio.emit("get_summary", {
         "summary": dictionary['summary'],
@@ -255,6 +306,7 @@ def collect_info(data):
     #     "series": get_line_chart(model_data),
     # })
 
+    '''
     histograms = get_artist_histograms()
     socketio.emit("get_style_hists", {
         "series": [{
@@ -262,6 +314,7 @@ def collect_info(data):
             "text": key,
         } for key, values in histograms.items()],
     })
+    '''
 
 
 @socketio.event
@@ -270,6 +323,7 @@ def generate_images(data):
         socketio.emit("images_generated", {
             "images": [],
             "seeds": [],
+            "success": False,
             "message": "No Graphical Processing Unit available!"
         })
         return
@@ -280,15 +334,56 @@ def generate_images(data):
 
     seeds = np.random.randint(0, 10000, amount)
 
-    images = []
     if classification_type == "artists":
+        try:
+            class_idx = generate.ARTIST_LABELS.index(class_idx)
+        except ValueError:
+            message = f"Label {repr(class_idx)} does not exist!"
+            socketio.emit("images_generated", {
+                "images": [],
+                "seeds": [],
+                "success": False,
+                "message": message,
+            })
+            raise ValueError(message)
+
         images = generate.generate_images(G_artists, seeds, class_idx)
     elif classification_type == "centuries":
+        print(f"Generating painting from the {class_idx}th century")
         images = generate.generate_images(G_centuries, seeds, class_idx)
+    else:
+        message = f"Type {repr(classification_type)} is not known!"
+        socketio.emit("images_generated", {
+            "images": [],
+            "seeds": [],
+            "success": False,
+            "message": message
+        })
+        raise ValueError(message)
+
+    image_data = []
+
+    for image in images:
+        colors, percentages, dom_color = detect_colors(image)
+
+        image_data.append({
+            'image': encode_image(image),
+            'dominant_color': dom_color,
+            'color_palette': colors,
+            'color_distribution': percentages,
+        })
+
+    first_image = image_data[0]
+    socketio.emit("change_color", first_image['dominant_color'])
+    socketio.emit("set_color_pie", {
+        "colors": first_image['color_palette'],
+        "percentages": first_image['color_distribution'],
+    })
 
     socketio.emit("images_generated", {
-        "images": images,
+        "images": image_data,
         "seeds": seeds.tolist(),
+        "success": True,
         "message": ""
     })
 
@@ -301,14 +396,16 @@ def get_timeline_data(artists=None, adding=False):
         'artists': artists
     }
 
+
 @socketio.event
 def get_all_artists():
     return all_artists
 
+
 @socketio.event
 def get_artist_histograms(data):
     artists = data['artists']
-    print(artists)
+    # print(artists)
     histograms = _get_artist_histograms(artists)
     socketio.emit("get_style_hists", {
         "series": [{
@@ -316,6 +413,7 @@ def get_artist_histograms(data):
             "text": key,
         } for key, values in histograms.items()],
     })
+
 
 @socketio.on('connect')
 def test_connect():
