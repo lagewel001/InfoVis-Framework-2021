@@ -7,6 +7,8 @@ import re
 
 from collections import Counter
 
+from .GAN.generate import ARTIST_LABELS
+
 
 # Load data as panda dfs #
 
@@ -184,7 +186,7 @@ def get_model_data():
 
 def _get_timeline_data(artists=None, adding=False):
     if artists is None:
-        artists = FEATURED_ARTISTS
+        artists = ARTIST_LABELS
 
     if adding:
         for i, artist in enumerate(artists):
@@ -193,7 +195,7 @@ def _get_timeline_data(artists=None, adding=False):
                 if not artist_last_name.empty:
                     artists[i] = artist_last_name.iloc[0]['artist_last_name']
 
-    if not os.path.exists(TIMELINE_PATH) or artists != FEATURED_ARTISTS:
+    if not os.path.exists(TIMELINE_PATH) or artists != ARTIST_LABELS:
         featured_paintings = paintings[paintings['artist_last_name'].isin(artists)]
         year_dict = Counter(featured_paintings['creation_year'].to_numpy(dtype=int))
 
@@ -232,7 +234,7 @@ def _get_timeline_data(artists=None, adding=False):
                     j = 0
                     break
 
-        if artists == FEATURED_ARTISTS:
+        if artists == ARTIST_LABELS:
             with open(TIMELINE_PATH, 'wb') as file:
                 pickle.dump(timeline_data, file)
     else:

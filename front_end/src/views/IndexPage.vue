@@ -5,17 +5,17 @@ from data import *;
       <!-- <div v-if="!chosen"> -->
 
         <!-- <vs-col type="flex" vs-justify="left" vs-align="left" vs-w="7"> -->
-           
+
           <vs-row vs-justify="top">
 
-            <vs-col type="flex" vs-justify="left" vs-align="left" vs-w="8">  
+            <vs-col type="flex" vs-justify="left" vs-align="left" vs-w="8">
 
               <!-- <div v-if="fetched.img_existend"> -->
                 <!-- <vs-col type="flex" vs-justify="left" vs-align="left" vs-w="6">
-                  
+
                   <transition mode="out-in" enter-active-class="animate__animated animate__fadeInLeft" leave-active-class="animate__animated animate__fadeOutRight">
                     <vs-card class="cardx" v-if="fetched.img_existend" fixedHeight vs-w="5">
-                      <div slot="header"><h3>Existend Art Piece: {{exist_title}}, {{exist_artist}}, {{exist_year}}</h3></div>
+                      <div slot="header"><h3>Existing Art Piece: {{exist_title}}, {{exist_artist}}, {{exist_year}}</h3></div>
 
                           <div slot="media">
                               <img v-bind:src="existend_img">
@@ -25,7 +25,7 @@ from data import *;
                 </vs-col> -->
 
                 <vs-col type="flex" vs-justify="left" vs-align="left" vs-w="6">
-                  
+
                   <transition mode="out-in" enter-active-class="animate__animated animate__fadeInLeft" leave-active-class="animate__animated animate__fadeOutRight">
                     <vs-card class="cardx" v-if="fetched.img_existend" fixedHeight vs-w="5">
                       <!-- <div slot="header"><h3>Existend Art Piece: {{exist_title}}, {{exist_artist}}, {{exist_year}}</h3></div> -->
@@ -49,8 +49,6 @@ from data import *;
                     </vs-card>
                   </transition>
                 </vs-col>
-                  
-                
 
                 <vs-col type="flex" vs-justify="right" vs-align="right" vs-w="6">
                  <!-- <vs-card class="cardx" v-if="fetched.img_existend" fixedHeight vs-w="5">
@@ -66,7 +64,7 @@ from data import *;
               </carousel-3d>
 
                   </vs-card> -->
-                  
+
                   <transition mode="out-in" enter-active-class="animate__animated animate__fadeInDown" leave-active-class="animate__animated animate__fadeOutUp">
                     <vs-card class="cardx" v-if="fetched.img_generated" fixedHeight vs-w="5">
                       <div slot="header"><h3>Generated Art Piece</h3></div>
@@ -77,7 +75,7 @@ from data import *;
 
                            <!-- <carousel-3d>
 
-                   
+
                                 <slide v-for="(slide, i) in generated_imgs" :index="i" :key="i">
                                   <template slot-scope="{ index, isCurrent, leftIndex, rightIndex }">
                                     <img :data-index="index" :class="{ current: isCurrent, onLeft: (leftIndex >= 0), onRight: (rightIndex >= 0) }" :src="slide">
@@ -92,12 +90,12 @@ from data import *;
 
             </vs-col>
 
-            <vs-col type="flex" vs-justify="right" vs-align="right" vs-w="4">  
+            <vs-col type="flex" vs-justify="right" vs-align="right" vs-w="4">
 
               <vs-row vs-justify='top'>
 
-                <vs-col type="flex" vs-justify="right" vs-align="right" vs-w="6">  
-                
+                <vs-col type="flex" vs-justify="right" vs-align="right" vs-w="6">
+
                 <transition mode="out-in" enter-active-class="animate__animated animate__fadeInRight" leave-active-class="animate__animated animate__fadeOutLeft">
                   <vs-card class="cardx" v-if="fetched.col_generated">
                     <div slot="header"><h4>Dominant colors in this painting</h4></div>
@@ -116,8 +114,8 @@ from data import *;
 
             </vs-col>
 
-                <vs-col type="flex" vs-justify="right" vs-align="right" vs-w="6">  
-                    
+                <vs-col type="flex" vs-justify="right" vs-align="right" vs-w="6">
+
                     <transition mode="out-in" enter-active-class="animate__animated animate__fadeInRight" leave-active-class="animate__animated animate__fadeOutLeft">
 
                       <vs-card class="cardx" v-if="fetched.summary">
@@ -128,12 +126,12 @@ from data import *;
                       </vs-card>
 
                     </transition>
-                
+
                 </vs-col>
 
               </vs-row>
 
-                
+
 
               <vs-row vs-justify='bottom'>
 
@@ -149,7 +147,7 @@ from data import *;
               </transition>
 
               </vs-row>
-            
+
             </vs-col>
 
 
@@ -157,7 +155,7 @@ from data import *;
 
           </vs-row>
 
-            
+
 
 
           <vs-row vs-justify="bottom">
@@ -213,7 +211,7 @@ from data import *;
              <transition mode="out-in" enter-active-class="animate__animated animate__fadeInUp" leave-active-class="animate__animated animate__fadeOutDown">
 
                   <vs-card class="cardx" v-if="fetched.histograms">
-                    <div slot="header"><h3>Usage of dominant colors: {{selected_artist}}</h3></div>
+                    <div slot="header"><h3>Distribution of dominant colors: {{selected_artist}}</h3></div>
                     <zingchart
                     ref="style_hist"
                     :data="style_hist_data"
@@ -229,7 +227,7 @@ from data import *;
 
               <vs-col type="flex" vs-justify="right" vs-align="right" vs-w="3">
 
-    
+
               <transition mode="out-in" enter-active-class="animate__animated animate__fadeInRight" leave-active-class="animate__animated animate__fadeOutLeft">
               <vs-card class="cardx" v-if="fetched.line_chart" >
                 <div slot="header"><h3>Dominant colors over the years: {{selected_artist}}</h3></div>
@@ -248,24 +246,12 @@ from data import *;
             </transition>
 
             </vs-col>
-            
-
 
           <!-- </vs-col> -->
           </vs-row>
           <!-- </vs-row> -->
-
-          
         <!-- </vs-col> -->
       <!-- </div>  -->
-
-
-        
- 
-           
-
-
-
     </div>
 </template>
 
@@ -321,21 +307,15 @@ export default {
       exist_year: '',
       exist_artist: '',
       line_chart_data: {
-        type: 'scatter',
+        type: 'mixed',
         plot: {
-          // aspect: "spline",
           tooltip: {
-            text: "artist: %t \n year: %kt"
+            text: "%t\nHue: %v\nYear: %kt"
           },
           marker: {
             visible: true,
             style: ["#fff", "#aaa", "#000"],
           },
-          animation: {
-            effect: 1,
-            sequence: 3,
-            speed: 10,
-          }
         },
         scaleX: {
           label: {
@@ -346,6 +326,9 @@ export default {
           label: {
             "text": "Hue",
           },
+          minValue: 0.0,
+          maxValue: 1.0,
+          step: 0.1,
         },
         series: [
         ],
@@ -368,9 +351,9 @@ export default {
         ]
       },
       style_hist_data: {
-        type: 'area',
+        type: 'hbar',
         plot: {
-          aspect: "spline",
+          aspect: "histogram",
           marker: {
             visible: false,
           },
@@ -380,12 +363,23 @@ export default {
             speed: 10,
           },
         },
+        plotarea: {
+          "adjust-layout": true,
+        },
         scaleX: {
           label: {
             "text": "Hue",
           },
+          item: {
+            offsetY: 0.05,
+          },
+          labels: [
+            '0.0-0.1', '0.1-0.2', '0.2-0.3', '0.3-0.4', '0.4-0.5',
+            '0.5-0.6', '0.6-0.7', '0.7-0.8', '0.8-0.9', '0.9-1.0',
+          ],
         },
         scaleY: {
+          // values: "0:1",
           label: {
             "text": "Density",
           },
@@ -396,6 +390,7 @@ export default {
           {values: [2, 3, 4, 3, 2, 3, 4, 2, 1]},
         ],
         legend: {},
+        /*
         labels: [
           {
             // text: "Test",
@@ -411,6 +406,7 @@ export default {
             fillAngle: 0,
           }
         ],
+        */
       },
       chart_key: 0,
       pie_key: 0,
@@ -451,13 +447,6 @@ export default {
   methods: {
     handleNodeHighlight(e) {
       this.lastVisited = `Node: ${e.nodeindex} Value: ${e.value}`;
-    },
-
-    async get_line_graph() {
-      var artist = this.selected;
-      this.$parent.socket.emit("collect_line_chart", {
-        'artist': artist,
-      });
     },
 
     async get_info(genre) {
@@ -513,9 +502,13 @@ export default {
               this.time_line_size = 6;
               this.$parent.socket.emit("get_artist_histograms", {artists: filters});
               this.$parent.socket.emit("collect_line_chart", {
-                'artist': filters[filters.length - 1],
+                labels: filters,
               });
               this.selected_artist = filters;
+
+              // this.get_info(this.selected_artist)
+
+              // this.genre = filter
 
               this.genre = filters[filters.length - 1];
               this.$parent.socket.emit("collect_info", {
@@ -705,9 +698,8 @@ export default {
 
     this.$parent.socket.on("images_generated", (data) => {
       console.log("Received generated image", data);
-      // this.generated_img = data.images[0].image;
-      // this.generated_imgs = data.images.image;
-      this.generated_img = "@/assets/images/big/img1.jpg";
+      this.generated_img = data.images[0].image;
+      // this.generated_img = "@/assets/images/big/img1.jpg";
       this.fetched.img_generated = true;
     });
 
@@ -751,16 +743,15 @@ export default {
   height: 80px;
   background-color: skyblue;
 } */
-/* 
+/*
 .scale{
     zoom: 0.75;
     -moz-transform: scale(0.75);
 } */
 
-
 .scale{
-    zoom: 0.6;
-    -moz-transform: scale(0.6);
+    zoom: 1.0;
+    -moz-transform: scale(1.0);
 }
 
 </style>
