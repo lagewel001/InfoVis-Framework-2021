@@ -40,6 +40,21 @@ app = Flask(__name__)
 CORS(app)
 socketio = SocketIO(app, cors_allowed_origins='*')
 
+WIKI_NAME_MAP = {
+    "eyck": "Jan van Eyck",
+    "vinci": "Leonardo da Vinci",
+    "bosch": "Jheronimus Bosch",
+    "hals": "Frans Hals",
+    "greco": "El Greco",
+    "dyck": "Anthony van Dyck",
+    "rijn": "Rembrandt",
+    "steen": "Jan Steen",
+    "blake": "William Blake",
+    "turner": "J. M. W. Turner",
+    "delacroix": "Eugène Delacroix",
+    "gogh": "Vincent van Gogh"
+}
+
 
 def detect_colors(image):
     image = image.resize((RESIZE, RESIZE))
@@ -79,10 +94,9 @@ def retrieve_info(genre):
     # ranges = float(1)
     dictionary = {}
 
-    w = wikipedia.page(genre)
-    dictionary['genre'] = w.title
+    genre = WIKI_NAME_MAP[genre] if genre in WIKI_NAME_MAP else genre
 
-    dictionary['summary'] = wikipedia.summary(genre, sentences=3)
+    dictionary['summary'] = wikipedia.summary(genre, sentences=3, auto_suggest=False)
 
     # print('artworks in same time period:')
     # other art pieces created in same year
