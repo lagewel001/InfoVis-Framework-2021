@@ -50,7 +50,8 @@ sys.path.append("./GAN/")
 
 if torch.cuda.is_available():
     DEVICE = torch.device('cuda')
-
+# else:
+#     DEVICE = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
     with dnnlib.util.open_url("./GAN/models/artists.pkl") as f:
         G_artists = pickle.Unpickler(f).load()['G_ema'].to(DEVICE)
 
@@ -402,7 +403,7 @@ def generate_images(data):
     amount = data["amount"]
     class_idx = data["class_idx"]
     compare = data['compare']
-    images2 = false
+    images2 = False
     if compare:
         class_idx2 = data["class_idx2"]
 

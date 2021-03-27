@@ -25,6 +25,10 @@ def generate_images(generator, seeds, class_idx):
     """Generate images using pretrained network pickle. """
 
     device = torch.device("cuda")
+    # if torch.cuda.is_available():
+    #     device = torch.device('cuda')
+    # else:
+    #     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
     # Labels.
     label = torch.zeros([1, generator.c_dim], device=device)
