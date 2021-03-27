@@ -440,7 +440,7 @@ from data import *;
                     <vs-row vs-justify='bottom'>
                       <transition name="slide-fade">
                         <vs-card class="cardx" style="border-style: solid; border-color:blue; border-width: thin;" v-if="fetched.related_terms" >
-                          <div slot="header"><h4>Related terms</h4></div>
+                          <div slot="header"><h4>Related terms {{ genre }} </h4></div>
                           <div>
                             {{ related_terms }}
                           </div>
@@ -487,7 +487,7 @@ from data import *;
                     <vs-row vs-justify='bottom'>
                       <transition name="slide-fade">
                         <vs-card class="cardx" style="border-style: solid; border-color:orange; border-width: thin;" v-if="fetched.related_terms2" >
-                          <div slot="header"><h4>Related terms</h4></div>
+                          <div slot="header"><h4>Related terms {{ genre2 }}</h4></div>
                           <div>
                             {{ related_terms2 }}
                           </div>
@@ -942,7 +942,8 @@ export default {
 
                   // this.genre = filter
 
-                  this.genre = filters[filters.length - 1];
+                  this.genre = filters[0];
+                  this.genre2 = filters[1]
                   this.$parent.socket.emit("collect_info", {
                     type: "artists",
                     compare: true,
@@ -1066,6 +1067,7 @@ export default {
           var century2 = false
           
           this.genre = century
+          this.genre2 = century
 
 
           if(!this.checked) {
