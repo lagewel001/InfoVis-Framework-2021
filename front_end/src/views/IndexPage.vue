@@ -1,7 +1,8 @@
 from data import *;
 
 <template>
-    <div class="scale">
+  <div>
+    <div v-if="!checked" class="scale">
       <!-- <div v-if="!chosen"> -->
 
         <!-- <vs-col type="flex" vs-justify="left" vs-align="left" vs-w="7"> -->
@@ -158,9 +159,8 @@ from data import *;
 
 
 
-          <vs-row vs-justify="bottom">
-<!-- vs-w="6" -->
-          <vs-col type="flex" vs-justify="left" vs-align="left" id="timeline-card" :vs-w="time_line_size">
+          <!-- <vs-row vs-justify="bottom"> -->
+          <!-- <vs-col type="flex" vs-justify="left" vs-align="left" id="timeline-card" :vs-w="time_line_size">
             <transition name="slide-fade">
               <vs-card class="cardx">
                 <div slot="header">
@@ -169,7 +169,7 @@ from data import *;
                 <div class="col-12">
                   <v-container>
                         <v-row>
-                            <v-combobox class="col-5" v-model="pending_add_artists" :items="all_artists" label="Select artist(s)"
+                            <v-combobox class="col-5" v-model="pending_add_artists" :items="all_artists" label="Add artist(s) option to timeline "
                                         hide-selected small-chips multiple>
                                 <template v-slot:prepend-inner>
                                     <v-progress-circular id="add-spinner" :size="20" :width="3"
@@ -181,7 +181,7 @@ from data import *;
                                 </template>
                             </v-combobox>
                             <v-combobox class="col-5 ml-4" v-model="pending_remove_artists" :items="artists_on_timeline"
-                                        label="Remove artist(s) from timeline" hide-selected small-chips multiple>
+                                        label="Remove artist(s) option from timeline" hide-selected small-chips multiple>
                                 <template v-slot:prepend-inner>
                                     <v-progress-circular id="remove-spinner" :size="20" :width="3"
                                                         style="display: none;" indeterminate color="primary">
@@ -192,6 +192,13 @@ from data import *;
                                 </template>
                             </v-combobox>
                         </v-row>
+                        <v-row>
+                          <label class="container">Compare Mode
+                          <input type="checkbox" id="checkbox" v-model="checked">
+                          <span class="checkmark"></span>
+                          </label>
+                          
+                        </v-row>
                   </v-container>
                 </div>
                 <div class="mt-3" id="timeline">
@@ -201,7 +208,7 @@ from data import *;
 
           </transition>
 
-          </vs-col>
+          </vs-col> -->
 
           <!-- <vs-col type="flex" vs-justify="right" vs-align="right" vs-w="5"> -->
 
@@ -248,11 +255,416 @@ from data import *;
             </vs-col>
 
           <!-- </vs-col> -->
-          </vs-row>
+          <!-- </vs-row> -->
           <!-- </vs-row> -->
         <!-- </vs-col> -->
       <!-- </div>  -->
+
+
     </div>
+
+
+
+
+
+
+    <div v-if="checked" class="scale">
+      <!-- <div v-if="!chosen"> -->
+
+        <!-- <vs-col type="flex" vs-justify="left" vs-align="left" vs-w="7"> -->
+
+          <vs-row vs-justify="top">
+
+            <!-- <vs-col type="flex" vs-justify="left" vs-align="left" vs-w="8"> -->
+
+              <!-- <div v-if="fetched.img_existend"> -->
+                <!-- <vs-col type="flex" vs-justify="left" vs-align="left" vs-w="6">
+
+                  <transition mode="out-in" enter-active-class="animate__animated animate__fadeInLeft" leave-active-class="animate__animated animate__fadeOutRight">
+                    <vs-card class="cardx" v-if="fetched.img_existend" fixedHeight vs-w="5">
+                      <div slot="header"><h3>Existing Art Piece: {{exist_title}}, {{exist_artist}}, {{exist_year}}</h3></div>
+
+                          <div slot="media">
+                              <img v-bind:src="existend_img">
+                          </div>
+                    </vs-card>
+                  </transition>
+                </vs-col> -->
+
+                <vs-col type="flex" vs-justify="left" vs-align="left" vs-w="6">
+
+                  <transition mode="out-in" enter-active-class="animate__animated animate__fadeInLeft" leave-active-class="animate__animated animate__fadeOutRight">
+                    <vs-card class="cardx"  style="border-style: solid; border-color:blue; border-width: thin;" v-if="fetched.img_existend" fixedHeight vs-w="5">
+                      <!-- <div slot="header"><h3>Existend Art Piece: {{exist_title}}, {{exist_artist}}, {{exist_year}}</h3></div> -->
+                      <div slot="header"><h3>Existing Art Pieces: {{exist_artist}}</h3></div>
+
+                          <div slot="media">
+
+
+                              <carousel-3d>
+
+                              <!-- <slide v-for="img in existend_imgs" v-bind:src="img"> </option> -->
+                              <!-- <div > -->
+                                <slide v-for="(slide, i) in existend_imgs" :index="i" :key="i">
+                                  <template slot-scope="{ index, isCurrent, leftIndex, rightIndex }">
+                                    <img :data-index="index" :class="{ current: isCurrent, onLeft: (leftIndex >= 0), onRight: (rightIndex >= 0) }" :src="slide">
+                                  </template>
+                                </slide>
+                              <!-- </div> -->
+                            </carousel-3d>
+                          </div>
+                    </vs-card>
+
+                  </transition>
+                </vs-col>
+
+                <vs-row type="flex" vs-justify="left" vs-align="left" vs-w="6">
+
+                  <transition mode="out-in" enter-active-class="animate__animated animate__fadeInLeft" leave-active-class="animate__animated animate__fadeOutRight">
+                    <vs-card class="cardx"  style="border-style: solid; border-color:orange; border-width: thin;" v-if="fetched.img_existend" fixedHeight vs-w="5">
+                      <!-- <div slot="header"><h3>Existend Art Piece: {{exist_title}}, {{exist_artist}}, {{exist_year}}</h3></div> -->
+                      <div slot="header"><h3>Existing Art Pieces: {{exist_artist2}}</h3></div>
+
+                          <div slot="media">
+
+
+                              <carousel-3d>
+
+                              <!-- <slide v-for="img in existend_imgs" v-bind:src="img"> </option> -->
+                              <!-- <div > -->
+                                <slide v-for="(slide, i) in existend_imgs2" :index="i" :key="i">
+                                  <template slot-scope="{ index, isCurrent, leftIndex, rightIndex }">
+                                    <img :data-index="index" :class="{ current: isCurrent, onLeft: (leftIndex >= 0), onRight: (rightIndex >= 0) }" :src="slide">
+                                  </template>
+                                </slide>
+                              <!-- </div> -->
+                            </carousel-3d>
+                          </div>
+                    </vs-card>
+
+                  </transition>
+                </vs-row>
+
+                <vs-col type="flex" vs-justify="right" vs-align="right" vs-w="6">
+                 <!-- <vs-card class="cardx" v-if="fetched.img_existend" fixedHeight vs-w="5">
+
+                  <carousel-3d>
+                <slide :index="0">
+                  <img v-bind:src="existend_img">
+                </slide>
+                <slide :index="1">
+                <img v-bind:src="existend_img">
+
+                </slide>
+              </carousel-3d>
+
+                  </vs-card> -->
+
+                  <transition mode="out-in" enter-active-class="animate__animated animate__fadeInDown" leave-active-class="animate__animated animate__fadeOutUp">
+                    <vs-card class="cardx" style="border-style: solid; border-color:blue; border-width: thin;" v-if="fetched.img_generated" fixedHeight vs-w="5">
+                      <div slot="header"><h3>Generated Art Piece</h3></div>
+
+                          <div slot="media"  v-if="fetched.img_generated">
+                              <img v-bind:src="generated_img">
+                          </div>
+
+                           <!-- <carousel-3d>
+
+
+                                <slide v-for="(slide, i) in generated_imgs" :index="i" :key="i">
+                                  <template slot-scope="{ index, isCurrent, leftIndex, rightIndex }">
+                                    <img :data-index="index" :class="{ current: isCurrent, onLeft: (leftIndex >= 0), onRight: (rightIndex >= 0) }" :src="slide">
+                                  </template>
+                                </slide>
+                            </carousel-3d> -->
+
+                    </vs-card>
+                  </transition>
+                </vs-col>
+
+                <vs-row type="flex" vs-justify="left" vs-align="left" vs-w="6">
+                <transition mode="out-in" enter-active-class="animate__animated animate__fadeInDown" leave-active-class="animate__animated animate__fadeOutUp">
+                    <vs-card class="cardx" style="border-style: solid; border-color:orange; border-width: thin;" v-if="fetched.img_generated" fixedHeight vs-w="5">
+                      <div slot="header"><h3>Generated Art Piece</h3></div>
+
+                          <div slot="media"  v-if="fetched.img_generated2">
+                              <img v-bind:src="generated_img2">
+                          </div>
+
+                    </vs-card>
+                  </transition>
+
+                  </vs-row>
+
+                      </vs-row>
+
+
+
+            <!-- </vs-col> -->
+
+            <!-- <vs-col type="flex" vs-justify="right" vs-align="right" vs-w="4"> -->
+
+              <vs-row vs-justify='top'>
+
+                <vs-col type="flex" vs-justify="right" vs-align="right" vs-w="6">
+
+                  <transition mode="out-in" enter-active-class="animate__animated animate__fadeInRight" leave-active-class="animate__animated animate__fadeOutLeft">
+                    <vs-card class="cardx" style="border-style: solid; border-color:blue; border-width: thin;" v-if="fetched.col_generated">
+                      <div slot="header"><h4>Dominant colors in this painting</h4></div>
+
+                      <div>
+                        <div id="app">
+                          <pie-chart
+                            :data="pie_data"
+                            :key="pie_key"
+                          />
+                        </div>
+                        <div id="my_dataviz"></div>
+                      </div>
+                    </vs-card>
+                  </transition>
+
+                  <vs-col type="flex" vs-justify="right" vs-align="right" vs-w="6">
+
+                    <vs-row vs-justify='top'>
+                      <transition mode="out-in" enter-active-class="animate__animated animate__fadeInRight" leave-active-class="animate__animated animate__fadeOutLeft">
+                        <vs-card class="cardx" style="border-style: solid; border-color:blue; border-width: thin;" v-if="fetched.summary">
+                          <div slot="header"><h4>{{ genre }} on Wikipedia</h4></div>
+                            <div style="font-size: 11pt">
+                              {{ summary }}
+                            </div>
+                        </vs-card>
+                      </transition>
+                    </vs-row>
+
+                    <vs-row vs-justify='bottom'>
+                      <transition name="slide-fade">
+                        <vs-card class="cardx" style="border-style: solid; border-color:blue; border-width: thin;" v-if="fetched.related_terms" >
+                          <div slot="header"><h4>Related terms</h4></div>
+                          <div>
+                            {{ related_terms }}
+                          </div>
+                        </vs-card>
+                      </transition>
+                    </vs-row>
+
+                  </vs-col>
+
+              </vs-col>
+
+
+               <vs-col type="flex" vs-justify="right" vs-align="right" vs-w="6">
+
+                  <transition mode="out-in" enter-active-class="animate__animated animate__fadeInRight" leave-active-class="animate__animated animate__fadeOutLeft">
+                    <vs-card class="cardx" style="border-style: solid; border-color:orange; border-width: thin;" v-if="fetched.col_generated2">
+                      <div slot="header"><h4>Dominant colors in this painting</h4></div>
+
+                      <div>
+                        <div id="app">
+                          <pie-chart
+                            :data="pie_data2"
+                            :key="pie_key2"
+                          />
+                        </div>
+                        <div id="my_dataviz"></div>
+                      </div>
+                    </vs-card>
+                  </transition>
+
+                  <vs-col type="flex" vs-justify="right" vs-align="right" vs-w="6">
+
+                    <vs-row vs-justify='top'>
+                      <transition mode="out-in" enter-active-class="animate__animated animate__fadeInRight" leave-active-class="animate__animated animate__fadeOutLeft">
+                        <vs-card class="cardx" style="border-style: solid; border-color:orange; border-width: thin;" v-if="fetched.summary2">
+                          <div slot="header"><h4>{{ genre2 }} on Wikipedia</h4></div>
+                            <div style="font-size: 11pt">
+                              {{ summary2 }}
+                            </div>
+                        </vs-card>
+                      </transition>
+                    </vs-row>
+
+                    <vs-row vs-justify='bottom'>
+                      <transition name="slide-fade">
+                        <vs-card class="cardx" style="border-style: solid; border-color:orange; border-width: thin;" v-if="fetched.related_terms2" >
+                          <div slot="header"><h4>Related terms</h4></div>
+                          <div>
+                            {{ related_terms2 }}
+                          </div>
+                        </vs-card>
+                      </transition>
+                    </vs-row>
+
+                  </vs-col>
+
+              </vs-col>
+                
+
+            </vs-row>
+
+
+
+             
+
+            <!-- </vs-col> -->
+
+
+
+
+          <!-- <vs-row vs-justify="top"> -->
+
+            <vs-col type="flex" vs-justify="left" vs-align="left" vs-w="3">
+
+
+             <transition mode="out-in" enter-active-class="animate__animated animate__fadeInUp" leave-active-class="animate__animated animate__fadeOutDown">
+
+                  <vs-card class="cardx" v-if="fetched.histograms">
+                    <div slot="header"><h3>Distribution of dominant colors: {{selected_artist}}</h3></div>
+                    <zingchart
+                    ref="style_hist"
+                    :data="style_hist_data"
+                    :key="hist_key"
+                  />
+                  </vs-card>
+
+                </transition>
+
+              </vs-col>
+
+
+
+              <vs-col type="flex" vs-justify="right" vs-align="right" vs-w="3">
+
+
+              <transition mode="out-in" enter-active-class="animate__animated animate__fadeInRight" leave-active-class="animate__animated animate__fadeOutLeft">
+              <vs-card class="cardx" v-if="fetched.line_chart" >
+                <div slot="header"><h3>Dominant colors over the years: {{selected_artist}}</h3></div>
+
+                <zingchart
+                  ref="line_chart"
+                  :data="line_chart_data"
+                  :key="chart_key"
+                  @node_mouseover="handleNodeHighlight"
+                />
+            </vs-card>
+            </transition>
+
+            </vs-col>
+
+
+
+<!-- 
+            <vs-col type="flex" vs-justify="left" vs-align="left" vs-w="3">
+
+
+             <transition mode="out-in" enter-active-class="animate__animated animate__fadeInUp" leave-active-class="animate__animated animate__fadeOutDown">
+
+                  <vs-card class="cardx" style="border-style: solid; border-color:orange; border-width: thin;" v-if="fetched.histograms2">
+                    <div slot="header"><h3>Distribution of dominant colors: {{selected_artist2}}</h3></div>
+                    <zingchart
+                    ref="style_hist"
+                    :data="style_hist_data2"
+                    :key="hist_key2"
+                  />
+                  </vs-card>
+
+                </transition>
+
+              </vs-col>
+
+
+
+              <vs-col type="flex" vs-justify="right" vs-align="right" vs-w="3">
+
+
+              <transition mode="out-in" enter-active-class="animate__animated animate__fadeInRight" leave-active-class="animate__animated animate__fadeOutLeft">
+              <vs-card class="cardx" style="border-style: solid; border-color:orange; border-width: thin;" v-if="fetched.line_chart2" >
+                <div slot="header"><h3>Dominant colors over the years: {{selected_artist2}}</h3></div>
+
+                <zingchart
+                  ref="line_chart"
+                  :data="line_chart_data2"
+                  :key="chart_key2"
+                  @node_mouseover="handleNodeHighlight"
+                />
+            </vs-card>
+            </transition>
+
+            </vs-col>
+
+ -->
+          <!-- </vs-row> -->
+
+
+    </div>
+
+
+    <!-- <vs-row vs-justify="bottom"> -->
+
+
+          <vs-col type="flex" vs-justify="left" vs-align="left" id="timeline-card" :vs-w="time_line_size">
+            <transition name="slide-fade">
+              <vs-card class="cardx">
+                <div slot="header">
+                    <h3>Pick a <span v-if="fetched.img_generated">new</span> style!</h3>
+                </div>
+                <div class="col-12">
+                  <v-container>
+                        <v-row>
+                            <v-combobox class="col-5" v-model="pending_add_artists" :items="all_artists" label="Add artist(s) option to timeline "
+                                        hide-selected small-chips multiple>
+                                <template v-slot:prepend-inner>
+                                    <v-progress-circular id="add-spinner" :size="20" :width="3"
+                                                        style="display: none;" indeterminate color="primary">
+                                    </v-progress-circular>
+                                </template>
+                                <template v-slot:append>
+                                    <v-btn height="auto" @click="addArtists" text>Add</v-btn>
+                                </template>
+                            </v-combobox>
+                            <v-combobox class="col-5 ml-4" v-model="pending_remove_artists" :items="artists_on_timeline"
+                                        label="Remove artist(s) option from timeline" hide-selected small-chips multiple>
+                                <template v-slot:prepend-inner>
+                                    <v-progress-circular id="remove-spinner" :size="20" :width="3"
+                                                        style="display: none;" indeterminate color="primary">
+                                    </v-progress-circular>
+                                </template>
+                                <template v-slot:append>
+                                    <v-btn height="auto" @click="removeArtists" text>Remove</v-btn>
+                                </template>
+                            </v-combobox>
+                        </v-row>
+                        <v-row>
+                          <label class="container">Compare Mode
+                          <input type="checkbox" id="checkbox" v-model="checked">
+                          <span class="checkmark"></span>
+                          </label>
+                          
+                          <!-- <label for="checkbox"> Compare mode</label> -->
+                        </v-row>
+                  </v-container>
+                </div>
+                <div class="mt-3" id="timeline">
+                    Painting happy little trees...
+                </div>
+              </vs-card>
+
+          </transition>
+          </vs-col>
+
+          <!-- <vs-col type="flex" vs-justify="right" vs-align="right" vs-w="5"> -->
+
+            
+
+          <!-- </vs-row> -->
+
+
+
+
+
+
+</div>
+
 </template>
 
 <script>
@@ -281,28 +693,43 @@ export default {
   },
   data: () => {
     return {
+      checked: false,
+      compare: false,
       time_line_size: 12,
-      artist_options: [],
-      genre: 'Hallo',
-      selected: 'airstream',
+      // artist_options: [],
+      // selected: 'airstream',    
+      genre: '',
       summary: '',
       related_terms: '',
+      genre2: '',
+      summary2: '',
+      related_terms2: '',
       fetched: {
         img_existend: false,
         img_generated: false,
         col_generated: false,
         summary: false,
         related_terms: false,
-        statistics: false,
-        more_statistics: false,
-        artist_options: false,
+        // artist_options: false,
         line_chart: false,
         histograms: false,
+
+        img_existend2: false,
+        img_generated2: false,
+        col_generated2: false,
+        summary2: false,
+        related_terms2: false,
+        line_chart2: false,
+        histograms2: false,
       },
       generated_img: "@/assets/images/big/img1.jpg",
       existend_img: "@/assets/images/big/img1.jpg",
       existend_imgs: [],
       generated_imgs: [],
+      generated_img2: "@/assets/images/big/img1.jpg",
+      existend_img2: "@/assets/images/big/img1.jpg",
+      existend_imgs2: [],
+      generated_imgs2: [],
       exist_title: '',
       exist_year: '',
       exist_artist: '',
@@ -481,7 +908,11 @@ export default {
           this.setZoomToFilter();
           this.setZoomToFilter();d3
           window.setTimeout(() => {
-            if (filters.includes(s.innerHTML)) {
+            
+          let zoomStart = null, zoomEnd = null;
+
+            if (this.checked) {
+              if (filters.includes(s.innerHTML)) {
               // Deselect clicked filters
               filters.splice(filters.indexOf(s.innerHTML));
               if (filters.length === 0) {
@@ -498,43 +929,117 @@ export default {
             }
 
             let zoomStart = null, zoomEnd = null;
-            if (filters.length > 0) {
-              this.time_line_size = 6;
-              this.$parent.socket.emit("get_artist_histograms", {artists: filters});
-              this.$parent.socket.emit("collect_line_chart", {
-                labels: filters,
-              });
-              this.selected_artist = filters;
 
-              // this.get_info(this.selected_artist)
+                if (filters.length == 2) {
+                  this.time_line_size = 6;
+                  this.$parent.socket.emit("get_artist_histograms", {artists: filters});
+                  this.$parent.socket.emit("collect_line_chart", {
+                    labels: filters,
+                  });
+                  this.selected_artist = filters;
 
-              // this.genre = filter
+                  // this.get_info(this.selected_artist)
 
-              this.genre = filters[filters.length - 1];
-              this.$parent.socket.emit("collect_info", {
-                type: "artists",
-                amount: 1,
-                class_idx: filters[filters.length - 1],
-              });
+                  // this.genre = filter
 
-              this.$parent.socket.emit("generate_images", {
-                type: "artists",
-                amount: 1,
-                class_idx: filters[filters.length - 1],
-              });
+                  this.genre = filters[filters.length - 1];
+                  this.$parent.socket.emit("collect_info", {
+                    type: "artists",
+                    compare: true,
+                    amount: 1,
+                    // class_idx: filters[filters.length - 1],
+                    class_idx: filters[0],
+                    class_idx2: filters[1],
+                  });
 
-              // Select specific filters
-              d3.selectAll(`.series-segment.${filters.join(',.series-segment.')}`)
-                .attr('class', (d) => { return `series-segment ${d.val}`})
-                .style('fill-opacity', .8)
-                .each((d, i) => {
-                  if (i === 0 && (!zoomStart || d.timeRange[0] < zoomStart)) zoomStart = d.timeRange[0]
-                  if (!zoomEnd || d.timeRange[1] > zoomEnd) zoomEnd = d.timeRange[1]
-                });
+                  this.$parent.socket.emit("generate_images", {
+                    type: "artists",
+                    compare: true,
+                    amount: 1,
+                    class_idx: filters[0],
+                    class_idx2: filters[1],
+                  });
 
-              d3.selectAll(`.color-slot.${filters.join(',color-slot.')}`)
-                .style('fill-opacity', 1);
+                  // Select specific filters
+                  d3.selectAll(`.series-segment.${filters.join(',.series-segment.')}`)
+                    .attr('class', (d) => { return `series-segment ${d.val}`})
+                    .style('fill-opacity', .8)
+                    .each((d, i) => {
+                      if (i === 0 && (!zoomStart || d.timeRange[0] < zoomStart)) zoomStart = d.timeRange[0]
+                      if (!zoomEnd || d.timeRange[1] > zoomEnd) zoomEnd = d.timeRange[1]
+                    });
+
+                  d3.selectAll(`.color-slot.${filters.join(',color-slot.')}`)
+                    .style('fill-opacity', 1);
+                
+                  this.compare = true
+                }
             }
+
+            if (!this.checked) {
+
+              if (filters.includes(s.innerHTML)) {
+              // Deselect clicked filters
+              filters.splice(filters.indexOf(s.innerHTML));
+              if (filters.length === 0) {
+                d3.selectAll('.series-segment')
+                    .attr('class', (d) => { return `series-segment ${d.val}` })
+                    .style('fill-opacity', .8);
+
+                d3.selectAll('.color-slot').style('fill-opacity', 1);
+                this.setZoomToFilter();
+              }
+            } else {
+                if (filters.length === 2) filters.shift();
+                filters.push(s.innerHTML);
+            }
+
+            let zoomStart = null, zoomEnd = null;
+
+                if (filters.length > 0) {
+                  this.time_line_size = 6;
+                  this.$parent.socket.emit("get_artist_histograms", {artists: filters});
+                  this.$parent.socket.emit("collect_line_chart", {
+                    labels: filters,
+                  });
+                  this.selected_artist = filters;
+
+                  // this.get_info(this.selected_artist)
+
+                  // this.genre = filter
+
+                  this.genre = filters[filters.length - 1];
+                  this.$parent.socket.emit("collect_info", {
+                    compare: false,
+                    type: "artists",
+                    amount: 1,
+                    class_idx: filters[filters.length - 1],
+                    class_idx2: false
+                  });
+
+                  this.$parent.socket.emit("generate_images", {
+                    compare: false,
+                    type: "artists",
+                    amount: 1,
+                    class_idx: filters[filters.length - 1],
+                    class_idx2: false
+                  });
+
+                  // Select specific filters
+                  d3.selectAll(`.series-segment.${filters.join(',.series-segment.')}`)
+                    .attr('class', (d) => { return `series-segment ${d.val}`})
+                    .style('fill-opacity', .8)
+                    .each((d, i) => {
+                      if (i === 0 && (!zoomStart || d.timeRange[0] < zoomStart)) zoomStart = d.timeRange[0]
+                      if (!zoomEnd || d.timeRange[1] > zoomEnd) zoomEnd = d.timeRange[1]
+                    });
+
+                  d3.selectAll(`.color-slot.${filters.join(',color-slot.')}`)
+                    .style('fill-opacity', 1);
+                }
+            }
+
+
 
             // Deselect all not selected
             d3.selectAll(`.series-segment:not(.${filters.join(',.')})`)
@@ -558,19 +1063,46 @@ export default {
           var avg_year = 0.5 * (start_year + end_year);
           var century = Math.round(avg_year / 100);
 
+          var century2 = false
+          
           this.genre = century
 
-          this.$parent.socket.emit("collect_info", {
-                type: "centuries",
-                amount: 1,
-                class_idx: century,
-              });
 
-          this.$parent.socket.emit("generate_images", {
-            type: "centuries",
-            amount: 1,
-            class_idx: century,
-          });
+          if(!this.checked) {
+            this.$parent.socket.emit("collect_info", {
+                  compare: false,   
+                  type: "centuries",
+                  amount: 1,
+                  class_idx: century,
+                  class_idx2: false,
+                });
+
+            this.$parent.socket.emit("generate_images", {
+              compare: false,
+              type: "centuries",
+              amount: 1,
+              class_idx: century,
+              class_idx2: false,
+            });
+          }
+          if(this.checked) {
+            this.genre2 = century2
+            this.$parent.socket.emit("collect_info", {
+                  compare: true,
+                  type: "centuries",
+                  amount: 1,
+                  class_idx: century,
+                  class_idx2: century2,
+                });
+
+            this.$parent.socket.emit("generate_images", {
+              compare: true,
+              type: "centuries",
+              amount: 1,
+              class_idx: century,
+              class_idx2: century2,
+            });
+          }
         })
         .onSegmentClick((s) => {
           console.log("Painting selected", s);
@@ -579,17 +1111,41 @@ export default {
 
           this.genre = s.val
 
-           this.$parent.socket.emit("collect_info", {
-                type: "artists",
-                amount: 1,
-                class_idx: s.val,
-              });
+          if(!this.checked) {
+          this.$parent.socket.emit("collect_info", {
+              compare: false,
+              type: "artists",
+              amount: 1,
+              class_idx: s.val,
+              class_idx2: false,
+            });
 
           this.$parent.socket.emit("generate_images", {
+            compare: false,
             type: "artists",
             amount: 1,
             class_idx: s.val,
+            class_idx2: false,
           });
+          }
+          if(this.checked) {
+          this.genre2 = s.val2
+          this.$parent.socket.emit("collect_info", {
+              compare: true,
+              type: "artists",
+              amount: 1,
+              class_idx: s.val,
+              class_idx2: s.val2,
+            });
+
+          this.$parent.socket.emit("generate_images", {
+            compare: true,
+            type: "artists",
+            amount: 1,
+            class_idx: s.val,
+            class_idx2: s.val2,
+          });
+          }
         })(container);
     },
     setZoomToFilter(start = null, end = null) {
@@ -657,6 +1213,15 @@ export default {
       this.exist_artist = data.artist;
       this.exist_year = data.year;
       this.fetched.img_existend = true;
+
+      if(this.compare){
+        this.existend_img2 = data.existend2;
+        this.existend_imgs2 = data.existend_imgs2;
+        this.exist_title2 = data.title2;
+        this.exist_artist2 = data.artist2;
+        this.exist_year2 = data.year2;
+        this.fetched.img_existend2 = true;
+    }
     });
 
     this.$parent.socket.on("set_color_pie", (data) => {
@@ -670,6 +1235,17 @@ export default {
       this.pie_key += 1;
     });
 
+    this.$parent.socket.on("set_color_pie2", (data) => {
+      this.pie_data2.labels = data.colors;
+      this.pie_data2.datasets = [{
+        label: "Data One",
+        backgroundColor: data.colors,
+        data: data.percentages,
+      }];
+      this.fetched.col_generated2 = true;
+      this.pie_key2 += 1;
+    });
+
     this.$parent.socket.on("get_style_hists", (data) => {
       this.style_hist_data.series = data.series;
       this.fetched.histograms = true;
@@ -681,12 +1257,18 @@ export default {
       this.fetched.summary = true;
       this.related_terms = data.related_terms;
       this.fetched.related_terms = true;
+      if(this.compare) {
+        this.summary2 = data.summary2;
+        this.fetched.summary2 = true;
+        this.related_terms2 = data.related_terms2;
+        this.fetched.related_terms2 = true;
+      }
     });
 
-    this.$parent.socket.on("set_selected_artist", (data) => {
-      this.artist_options = data.artist_options;
-      this.fetched.artist_options = true;
-    });
+    // this.$parent.socket.on("set_selected_artist", (data) => {
+    //   this.artist_options = data.artist_options;
+    //   this.fetched.artist_options = true;
+    // });
 
     this.$parent.socket.on("collect_line_chart", (data) => {
       this.line_chart_data.series = data.series;
@@ -694,14 +1276,29 @@ export default {
       console.log(this.line_chart_data);
       this.fetched.line_chart = true;
       this.chart_key += 1;
+      // if(this.compare) {
+      //   this.line_chart_data.series = data.series;
+      //   this.line_chart_data.plot.marker = data.plot.marker;
+      //   console.log(this.line_chart_data);
+      //   this.fetched.line_chart = true;
+      //   this.chart_key += 1;
+      // }
     });
 
     this.$parent.socket.on("images_generated", (data) => {
       console.log("Received generated image", data);
 			if (data.success) {
 				this.generated_img = data.images[0].image;
+        if (this.compare) {
+          this.generated_img2 = data.images2[0].image;
+          this.fetched.img_generated2 = true;
+        }
 			} else {
 				this.generated_img = "@/assets/images/big/img1.jpg";
+        if (this.compare) {
+          this.generated_img2 = "@/assets/images/big/img1.jpg";
+          this.fetched.img_generated2 = true;
+        }
 			}
       this.fetched.img_generated = true;
     });
@@ -757,4 +1354,75 @@ export default {
     -moz-transform: scale(1.0);
 }
 
+
+/* CHECKBOX
+
+/* Customize the label (the container) */
+.container {
+  display: block;
+  position: relative;
+  padding-left: 40px;
+  margin-bottom: 5px;
+  cursor: pointer;
+  font-size: 18px;
+  color: rgb(93, 90, 90);
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+/* Hide the browser's default checkbox */
+.container input {
+  position: absolute;
+  opacity: 0;
+  cursor: pointer;
+  height: 0;
+  width: 0;
+}
+
+/* Create a custom checkbox */
+.checkmark {
+  position: absolute;
+  top: 10px;
+  left: 0;
+  height: 25px;
+  width: 25px;
+  background-color: #eee;
+}
+
+/* On mouse-over, add a grey background color */
+.container:hover input ~ .checkmark {
+  background-color: #ccc;
+}
+
+/* When the checkbox is checked, add a blue background */
+.container input:checked ~ .checkmark {
+  background-color: #2196F3;
+}
+
+/* Create the checkmark/indicator (hidden when not checked) */
+.checkmark:after {
+  content: "";
+  position: absolute;
+  display: none;
+}
+
+/* Show the checkmark when checked */
+.container input:checked ~ .checkmark:after {
+  display: block;
+}
+
+/* Style the checkmark/indicator */
+.container .checkmark:after {
+  left: 9px;
+  top: 5px;
+  width: 5px;
+  height: 10px;
+  border: solid white;
+  border-width: 0 3px 3px 0;
+  -webkit-transform: rotate(45deg);
+  -ms-transform: rotate(45deg);
+  transform: rotate(45deg);
+}
 </style>

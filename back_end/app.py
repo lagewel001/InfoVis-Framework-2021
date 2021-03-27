@@ -289,40 +289,57 @@ def collect_info(data):
     class_type = data["type"]
     amount = data["amount"]
     class_idx = data["class_idx"]
+    compare = data['compare']
+
+    class_idx2 = data["class_idx2"]
+
+    existend2 = False
+    existend_imgs2 = False
+    title2 = False
+    artist2 = False
+    year2 = False
+    encoded_img2 = False
+    image_list2 = False
 
     # Load a placeholder image.
     # TODO: Obtain a generated image here.
-    # image_file = {
-    #     "Impressionism": "img1.jpg",
-    #     "Expressionism (fine arts)": "img2.jpg",
-    #     "Cubism": "img3.jpg",
-    #     "Surrealism": "img4.jpg",
-    # }.get(gen, "img1.jpg")
     image_list, image, title, artist, year = get_image(class_idx, class_type)
-    # print(image)
-
     # path = os.path.join(os.path.dirname(__file__), image_file)
     # image = Image.open(urllib3.urlopen(image))
     image = Image.open(urllib.request.urlopen(image))
-
-
     # Encode the image for the response.
     img_stream = BytesIO()
     image.save(img_stream, format="png")
     encoded_img = encodebytes(img_stream.getvalue()).decode('ascii')
+    
 
+
+    if compare:
+        image_list2, image2, title2, artist2, year2 = get_image(class_idx2, class_type)
+        image2 = Image.open(urllib.request.urlopen(image2))
+        # Encode the image for the response.
+        img_stream2 = BytesIO()
+        image2.save(img_stream2, format="png")
+        encoded_img2 = encodebytes(img_stream2.getvalue()).decode('ascii')
+        
     socketio.emit("set_image", {
-        "existend": f"data:image/png;base64, {encoded_img}",
-        "existend_imgs": image_list,
-        "title": title,
-        "artist": artist,
-        "year": year
-    })
+            "existend": f"data:image/png;base64, {encoded_img}",
+            "existend_imgs": image_list,
+            "title": title,
+            "artist": artist,
+            "year": year,
+            "existend2": f"data:image/png;base64, {encoded_img2}",
+            "existend_imgs2": image_list2,
+            "title2": title2,
+            "artist2": artist2,
+            "year2": year2
+        })
+
 
     # Get the primary color of the image.
     colors, percentages, dom_color = detect_colors(image)
-
     socketio.emit("change_color", dom_color)
+    
 
     '''
     socketio.emit("set_color_pie", {
@@ -334,15 +351,29 @@ def collect_info(data):
     # model_data = get_model_data()
 
     dictionary = retrieve_info(class_idx)
+    dictionary2 = False
+    if compare:
+        colors2, percentages2, dom_color2 = detect_colors(image2)
+        dictionary2 = retrieve_info(class_idx2)
 
-    socketio.emit("get_summary", {
-        "summary": dictionary['summary'],
-        "related_terms": dictionary['related_terms']
-    })
+    if compare:
+        socketio.emit("get_summary", {
+            "summary": dictionary['summary'],
+            "related_terms": dictionary['related_terms'],
+            "summary2": dictionary2['summary'],
+            "related_terms2": dictionary2['related_terms']
+        })
+    else:
+        socketio.emit("get_summary", {
+            "summary": dictionary['summary'],
+            "related_terms": dictionary['related_terms'],
+            "summary2": dictionary2,
+            "related_terms2": dictionary2
+        })
 
-    socketio.emit("set_selected_artist", {
-        "artist_options": get_artists(model_data),
-    })
+    # socketio.emit("set_selected_artist", {
+    #     "artist_options": get_artists(model_data),
+    # })
 
     '''
     histograms = get_artist_histograms()
@@ -360,6 +391,7 @@ def generate_images(data):
     if not torch.cuda.is_available():
         socketio.emit("images_generated", {
             "images": [],
+            "images2": [],
             "seeds": [],
             "success": False,
             "message": "No Graphical Processing Unit available!"
@@ -369,12 +401,18 @@ def generate_images(data):
     classification_type = data["type"]
     amount = data["amount"]
     class_idx = data["class_idx"]
+    compare = data['compare']
+    images2 = false
+    if compare:
+        class_idx2 = data["class_idx2"]
 
     seeds = np.random.randint(0, 10000, amount)
 
     if classification_type == "artists":
         try:
             class_idx = generate.ARTIST_LABELS.index(class_idx)
+            if compare:
+                class_idx2 = generate.ARTIST_LABELS.index(class_idx2)
         except ValueError:
             message = f"Label {repr(class_idx)} does not exist!"
             socketio.emit("images_generated", {
@@ -386,9 +424,13 @@ def generate_images(data):
             raise ValueError(message)
 
         images = generate.generate_images(G_artists, seeds, class_idx)
+        if compare:
+            images2 = generate.generate_images(G_artists, seeds, class_idx2)
     elif classification_type == "centuries":
         print(f"Generating painting from the {class_idx}th century")
         images = generate.generate_images(G_centuries, seeds, class_idx)
+        if compare:
+            images2 = generate.generate_images(G_centuries, seeds, class_idx2)
     else:
         message = f"Type {repr(classification_type)} is not known!"
         socketio.emit("images_generated", {
@@ -400,6 +442,7 @@ def generate_images(data):
         raise ValueError(message)
 
     image_data = []
+    image_data2 = []
 
     for image in images:
         colors, percentages, dom_color = detect_colors(image)
@@ -418,8 +461,30 @@ def generate_images(data):
         "percentages": first_image['color_distribution'],
     })
 
+
+    if compare:
+        for image in images2:
+            colors2, percentages2, dom_color2 = detect_colors(image2)
+
+            image_data2.append({
+                'image': encode_image(image2),
+                'dominant_color': dom_color2,
+                'color_palette': colors2,
+                'color_distribution': percentages2,
+            })
+
+        first_image2 = image_data2[0]
+        # socketio.emit("change_color", first_image2['dominant_color'])
+        socketio.emit("set_color_pie2", {
+            "colors": first_image2['color_palette'],
+            "percentages": first_image2['color_distribution'],
+        })
+
+
+
     socketio.emit("images_generated", {
         "images": image_data,
+        "images2": image_data2,
         "seeds": seeds.tolist(),
         "success": True,
         "message": ""
