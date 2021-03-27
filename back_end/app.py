@@ -120,7 +120,7 @@ def retrieve_info(genre):
 
     genre = WIKI_NAME_MAP[genre] if genre in WIKI_NAME_MAP else genre
 
-    dictionary['summary'] = wikipedia.summary(genre, sentences=3, auto_suggest=False)
+    dictionary['summary'] = wikipedia.summary(genre, sentences=2, auto_suggest=False)
 
     # print('artworks in same time period:')
     # other art pieces created in same year

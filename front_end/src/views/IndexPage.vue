@@ -9,7 +9,7 @@ from data import *;
 
           <vs-row vs-justify="top">
 
-            <vs-col type="flex" vs-justify="left" vs-align="left" vs-w="8">
+            <!-- <vs-col type="flex" vs-justify="left" vs-align="left" vs-w="8"> -->
 
               <!-- <div v-if="fetched.img_existend"> -->
                 <!-- <vs-col type="flex" vs-justify="left" vs-align="left" vs-w="6">
@@ -51,6 +51,7 @@ from data import *;
                   </transition>
                 </vs-col>
 
+                
                 <vs-col type="flex" vs-justify="right" vs-align="right" vs-w="6">
                  <!-- <vs-card class="cardx" v-if="fetched.img_existend" fixedHeight vs-w="5">
 
@@ -89,11 +90,14 @@ from data import *;
                 </vs-col>
 
 
-            </vs-col>
+            <!-- </vs-col> -->
 
-            <vs-col type="flex" vs-justify="right" vs-align="right" vs-w="4">
 
-              <vs-row vs-justify='top'>
+            
+
+            <!-- <vs-col type="flex" vs-justify="right" vs-align="right" vs-w="4">
+
+              <vs-row vs-justify='top'> -->
 
                 <vs-col type="flex" vs-justify="right" vs-align="right" vs-w="6">
 
@@ -115,6 +119,11 @@ from data import *;
 
             </vs-col>
 
+
+            </vs-row>
+
+            <vs-row vs-justify="top">
+
                 <vs-col type="flex" vs-justify="right" vs-align="right" vs-w="6">
 
                     <transition mode="out-in" enter-active-class="animate__animated animate__fadeInRight" leave-active-class="animate__animated animate__fadeOutLeft">
@@ -129,12 +138,14 @@ from data import *;
                     </transition>
 
                 </vs-col>
-
+<!-- 
               </vs-row>
 
 
 
-              <vs-row vs-justify='bottom'>
+              <vs-row vs-justify='bottom'> -->
+
+                <vs-col type="flex" vs-justify="right" vs-align="right" vs-w="6">
 
                 <transition name="slide-fade">
 
@@ -147,7 +158,7 @@ from data import *;
 
               </transition>
 
-              </vs-row>
+              <!-- </vs-row> -->
 
             </vs-col>
 
