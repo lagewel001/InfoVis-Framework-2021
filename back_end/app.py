@@ -8,6 +8,7 @@ import wikipedia
 import urllib.request
 import random
 import json
+import datetime
 
 from base64 import encodebytes
 from colour import Color
@@ -21,8 +22,31 @@ from scipy import cluster
 from .retrieve_info import retrieve_info, _get_artist_histograms
 from .data import model_data, all_artists, _get_timeline_data
 from .GAN import dnnlib, generate
+from datetimerange import DateTimeRange
+
+
+
+art_periods = [
+        {"name": "Medieval", "timeRange": DateTimeRange("500-01-01T10:00:00+0900", "1400-01-01T10:00:00+0900")},
+        {"name": "Renaissance", "timeRange": DateTimeRange("1400-01-01T10:00:00+0900", "1600-01-01T10:00:00+0900")},
+        {"name": "Mannerism", "timeRange": DateTimeRange("1527-01-01T10:00:00+0900", "1580-01-01T10:00:00+0900")},
+        {"name": "Baroque", "timeRange": [new Date(1600, 1, 1), new Date(1750, 1, 1)]},
+        {"name": "Rococo", "timeRange": [new Date(1699, 1, 1), new Date(1780, 1, 1)]},
+        {"name": "Neoclassicism", "timeRange": [new Date(1750, 1, 1), new Date(1850, 1, 1)]},
+        {"name": "Romanticism", "timeRange": [new Date(1780, 1, 1), new Date(1850, 1, 1)]},
+        {"name": "Realism", "timeRange": [new Date(1848, 1, 1), new Date(1900, 1, 1)]},
+        {"name": "Art Nouveau", "timeRange": [new Date(1890, 1, 1), new Date(1910, 1, 1)]},
+        {"name": "Impressionism", "timeRange": [new Date(1865, 1, 1), new Date(1885, 1, 1)]},
+        {"name": "Post-impressionism", "timeRange": [new Date(1885, 1, 1), new Date(1910, 1, 1)]},
+        {"name": "Fauvism", "timeRange": [new Date(1900, 1, 1), new Date(1935, 1, 1)]},
+        {"name": "Expressionism", "timeRange": [new Date(1905, 1, 1), new Date(1920, 1, 1)]},
+        {"name": "Cubism", "timeRange": [new Date(1907, 1, 1), new Date(1914, 1, 1)]},
+        {"name": "Surrealism", "timeRange": [new Date(1917, 1, 1), new Date(1950, 1, 1)]},
+        {"name": "Modern", "timeRange": [new Date(1950, 1, 1), new Date(2022, 1, 1)]},
+      ]
 
 sys.path.append("./GAN/")
+
 
 if torch.cuda.is_available():
     DEVICE = torch.device('cuda')
