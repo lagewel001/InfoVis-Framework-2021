@@ -1,389 +1,385 @@
 from data import *;
 
 <template>
-    <div>
-        <div v-if="!compare_mode" class="scale">
-            <vs-row>
-                <vs-col type="flex" vs-justify="left" vs-align="left" vs-lg="6" vs-sm="6" vs-xs="12">
-                    <transition mode="out-in" enter-active-class="animate__animated animate__fadeInLeft"
-                                leave-active-class="animate__animated animate__fadeOutRight">
-                        <vs-card class="cardx" v-if="fetched.img_existend" fixedHeight vs-w="5">
-                            <div slot="header">
-                                <h3>Existing Art Pieces: {{ exist_artist }}</h3>
-                            </div>
-
-                            <div slot="media">
-                                <carousel-3d>
-                                    <slide v-for="(slide, i) in existend_imgs" :index="i" :key="i">
-                                        <template slot-scope="{ index, isCurrent, leftIndex, rightIndex }">
-                                            <img :data-index="index"
-                                                 :class="{ current: isCurrent, onLeft: (leftIndex >= 0), onRight: (rightIndex >= 0) }"
-                                                 :src="slide">
-                                        </template>
-                                    </slide>
-                                </carousel-3d>
-                            </div>
-                        </vs-card>
-                    </transition>
-                </vs-col>
-
-                <vs-col type="flex" vs-justify="right" vs-align="right" vs-lg="6" vs-sm="6" vs-xs="12" class="mt-sm-0 mt-4">
-                    <transition mode="out-in" enter-active-class="animate__animated animate__fadeInDown"
-                                leave-active-class="animate__animated animate__fadeOutUp">
-                        <vs-card class="cardx" v-if="fetched.img_generated" fixedHeight vs-w="5">
-                            <div slot="header">
-                                <h3>Generated Art Piece</h3>
-                            </div>
-
-                            <div slot="media" v-if="fetched.img_generated">
-                                <img v-bind:src="generated_img">
-                            </div>
-                        </vs-card>
-                    </transition>
-                </vs-col>
-            </vs-row>
-
-            <vs-row>
-                <vs-col type="flex" vs-justify="right" vs-align="right" vs-w="12">
-                    <transition mode="out-in" enter-active-class="animate__animated animate__fadeInRight"
-                                leave-active-class="animate__animated animate__fadeOutLeft">
-                        <vs-card class="cardx" v-if="fetched.col_generated">
-                            <div slot="header">
-                                <h4>Dominant colors in this painting</h4>
-                            </div>
-
-                            <div>
-                                <div id="app">
-                                    <pie-chart :data="pie_data" :key="pie_key"></pie-chart>
-                                </div>
-                                <div id="my_dataviz"></div>
-                            </div>
-                        </vs-card>
-                    </transition>
-                </vs-col>
-            </vs-row>
-
-            <vs-row :class="fetched.col_generated ? '' : 'mt-4'">
-                <vs-col type="flex" vs-justify="left" vs-align="left" vs-lg="6" vs-sm="6" vs-xs="12">
-                    <transition mode="out-in" enter-active-class="animate__animated animate__fadeInRight"
-                                leave-active-class="animate__animated animate__fadeOutLeft">
-                        <vs-card class="cardx" v-if="fetched.summary">
-                            <div slot="header"><h4>{{ genre }} on Wikipedia</h4></div>
-                            <div style="font-size: 11pt">
-                                {{ summary }}
-                            </div>
-                        </vs-card>
-                    </transition>
-                </vs-col>
-
-                <vs-col type="flex" vs-justify="right" vs-align="right" vs-lg="6" vs-sm="6" vs-xs="12">
-                    <transition name="slide-fade">
-                        <vs-card class="cardx" v-if="fetched.related_terms">
-                            <div slot="header"><h4>Related terms</h4></div>
-                            <div>
-                                {{ related_terms }}
-                            </div>
-                        </vs-card>
-                    </transition>
-                </vs-col>
-            </vs-row>
-
-            <vs-row>
-                 <vs-col type="flex" vs-justify="left" vs-align="left" vs-lg="6" vs-sm="6" vs-xs="12">
-                    <transition mode="out-in" enter-active-class="animate__animated animate__fadeInUp"
-                                leave-active-class="animate__animated animate__fadeOutDown">
-                        <vs-card class="cardx" v-if="fetched.histograms">
-                            <div slot="header"><h3>Distribution of dominant colors: {{ selected_artist }}</h3></div>
-                            <zingchart
-                                    ref="style_hist"
-                                    :data="style_hist_data"
-                                    :key="hist_key"
-                            />
-                        </vs-card>
-                    </transition>
-                </vs-col>
-
-                <vs-col type="flex" vs-justify="right" vs-align="right" vs-lg="6" vs-sm="6" vs-xs="12">
-                    <transition mode="out-in" enter-active-class="animate__animated animate__fadeInRight"
-                                leave-active-class="animate__animated animate__fadeOutLeft">
-                        <vs-card class="cardx" v-if="fetched.line_chart">
-                            <div slot="header"><h3>Dominant colors over the years: {{ selected_artist }}</h3></div>
-                            <zingchart
-                                    ref="line_chart"
-                                    :data="line_chart_data"
-                                    :key="chart_key"
-                                    @node_mouseover="handleNodeHighlight"
-                            />
-                        </vs-card>
-                    </transition>
-                </vs-col>
-            </vs-row>
-        </div>
-
-
-
-        <div v-if="compare_mode" class="scale">
-            <vs-row vs-justify="top">
-                <vs-col type="flex" vs-justify="left" vs-align="left" vs-lg="6" vs-sm="6" vs-xs="12">
-                    <transition mode="out-in" enter-active-class="animate__animated animate__fadeInLeft"
-                                leave-active-class="animate__animated animate__fadeOutRight">
-                        <vs-card class="cardx" style="border-style: solid; border-color:blue; border-width: thin;"
-                                 v-if="fetched.img_existend" fixedHeight vs-w="5">
-                            <div slot="header">
-                                <h3>Existing Art Pieces: {{ exist_artist }}</h3>
-                            </div>
-
-                            <div slot="media">
-                                <carousel-3d>
-                                    <slide v-for="(slide, i) in existend_imgs" :index="i" :key="i">
-                                        <template slot-scope="{ index, isCurrent, leftIndex, rightIndex }">
-                                            <img :data-index="index"
-                                                 :class="{ current: isCurrent, onLeft: (leftIndex >= 0), onRight: (rightIndex >= 0) }"
-                                                 :src="slide">
-                                        </template>
-                                    </slide>
-                                </carousel-3d>
-                            </div>
-                        </vs-card>
-                    </transition>
-                </vs-col>
-
-                <vs-col type="flex" vs-justify="right" vs-align="right" vs-lg="6" vs-sm="6" vs-xs="12" class="mt-sm-0 mt-4">
-                    <transition mode="out-in" enter-active-class="animate__animated animate__fadeInRight"
-                                leave-active-class="animate__animated animate__fadeOutRight">
-                        <vs-card class="cardx" style="border-style: solid; border-color:orange; border-width: thin;"
-                                 v-if="fetched.img_existend" fixedHeight vs-w="5">
-                            <div slot="header">
-                                <h3>Existing Art Pieces: {{ exist_artist2 }}</h3>
-                            </div>
-
-                            <div slot="media">
-                                <carousel-3d>
-                                    <slide v-for="(slide, i) in existend_imgs2" :index="i" :key="i">
-                                        <template slot-scope="{ index, isCurrent, leftIndex, rightIndex }">
-                                            <img :data-index="index"
-                                                 :class="{ current: isCurrent, onLeft: (leftIndex >= 0), onRight: (rightIndex >= 0) }"
-                                                 :src="slide">
-                                        </template>
-                                    </slide>
-                                </carousel-3d>
-                            </div>
-                        </vs-card>
-                    </transition>
-                </vs-col>
-            </vs-row>
-
-            <vs-row class="mt-4 mb-4">
-                <vs-col type="flex" vs-justify="left" vs-align="left" vs-lg="6" vs-sm="6" vs-xs="12">
-                    <transition mode="out-in" enter-active-class="animate__animated animate__fadeInDown"
-                                leave-active-class="animate__animated animate__fadeOutUp">
-                        <vs-card class="cardx" style="border-style: solid; border-color:blue; border-width: thin;"
-                                 v-if="fetched.img_generated" fixedHeight vs-w="5">
-                            <div slot="header">
-                                <h3>Generated Art Piece</h3>
-                            </div>
-
-                            <div slot="media" v-if="fetched.img_generated">
-                                <img v-bind:src="generated_img">
-                            </div>
-                        </vs-card>
-                    </transition>
-                </vs-col>
-
-                <vs-col type="flex" vs-justify="right" vs-align="right" vs-lg="6" vs-sm="6" vs-xs="12" class="mt-sm-0 mt-4">
-                    <transition mode="out-in" enter-active-class="animate__animated animate__fadeInDown"
-                                leave-active-class="animate__animated animate__fadeOutUp">
-                        <vs-card class="cardx" style="border-style: solid; border-color:orange; border-width: thin;"
-                                 v-if="fetched.img_generated" fixedHeight vs-w="5">
-                            <div slot="header">
-                                <h3>Generated Art Piece</h3>
-                            </div>
-
-                            <div slot="media" v-if="fetched.img_generated2">
-                                <img v-bind:src="generated_img2">
-                            </div>
-                        </vs-card>
-                    </transition>
-                </vs-col>
-            </vs-row>
-
-            <vs-row vs-justify='top'>
-                <vs-col type="flex" vs-lg="6" vs-sm="6" vs-xs="12">
-                    <vs-row>
-                        <vs-col type="flex" vs-justify="flex-start" vs-lg="6" vs-sm="6" vs-xs="12" class="pl-0">
-                                <transition mode="out-in" enter-active-class="animate__animated animate__fadeInRight"
-                                            leave-active-class="animate__animated animate__fadeOutLeft">
-                                    <vs-card class="cardx"
-                                             style="border-style: solid; border-color:blue; border-width: thin;"
-                                             v-if="fetched.summary">
-                                        <div slot="header"><h4>{{ genre }} on Wikipedia</h4></div>
-                                        <div style="font-size: 11pt">
-                                            {{ summary }}
-                                        </div>
-                                    </vs-card>
-                                </transition>
-                        </vs-col>
-
-                        <vs-col type="flex" vs-justify="flex-end" vs-lg="6" vs-sm="6" vs-xs="12" class="pr-0">
-                            <transition name="slide-fade">
-                                <vs-card class="cardx"
-                                         style="border-style: solid; border-color:blue; border-width: thin;"
-                                         v-if="fetched.related_terms">
-                                    <div slot="header"><h4>Related terms {{ genre }} </h4></div>
-                                    <div>
-                                        {{ related_terms }}
-                                    </div>
-                                </vs-card>
-                            </transition>
-                        </vs-col>
-
-                        <vs-col vs-w="12">
-                            <transition mode="out-in" enter-active-class="animate__animated animate__fadeInRight"
-                                leave-active-class="animate__animated animate__fadeOutLeft">
-                                <vs-card class="cardx" style="border-style: solid; border-color:blue; border-width: thin;"
-                                         v-if="fetched.col_generated">
-                                    <div slot="header"><h4>Dominant colors in this painting</h4></div>
-                                    <div>
-                                        <div id="app">
-                                            <pie-chart :data="pie_data" :key="pie_key"></pie-chart>
-                                        </div>
-                                        <div id="my_dataviz"></div>
-                                    </div>
-                                </vs-card>
-                            </transition>
-                        </vs-col>
-                    </vs-row>
-                </vs-col>
-
-                <vs-col type="flex" vs-justify="right" vs-align="right" vs-lg="6" vs-sm="6" vs-xs="12">
-                    <vs-row>
-                        <vs-col type="flex" vs-justify="flex-start" vs-lg="6" vs-sm="6" vs-xs="12" class="pl-0">
-                            <transition mode="out-in" enter-active-class="animate__animated animate__fadeInRight"
-                                        leave-active-class="animate__animated animate__fadeOutLeft">
-                                <vs-card class="cardx"
-                                         style="border-style: solid; border-color:orange; border-width: thin;"
-                                         v-if="fetched.summary2">
-                                    <div slot="header"><h4>{{ genre2 }} on Wikipedia</h4></div>
-                                    <div style="font-size: 11pt">
-                                        {{ summary2 }}
-                                    </div>
-                                </vs-card>
-                            </transition>
-                        </vs-col>
-
-                        <vs-col type="flex" vs-justify="flex-end" vs-lg="6" vs-sm="6" vs-xs="12" class="pr-0">
-                            <transition name="slide-fade">
-                                <vs-card class="cardx"
-                                         style="border-style: solid; border-color:orange; border-width: thin;"
-                                         v-if="fetched.related_terms2">
-                                    <div slot="header"><h4>Related terms {{ genre2 }}</h4></div>
-                                    <div>
-                                        {{ related_terms2 }}
-                                    </div>
-                                </vs-card>
-                            </transition>
-                        </vs-col>
-
-                        <vs-col vs-w="12">
-                            <transition mode="out-in" enter-active-class="animate__animated animate__fadeInRight"
-                                leave-active-class="animate__animated animate__fadeOutLeft">
-                                <vs-card class="cardx" style="border-style: solid; border-color:orange; border-width: thin;"
-                                         v-if="fetched.col_generated2">
-                                    <div slot="header"><h4>Dominant colors in this painting</h4></div>
-                                    <div>
-                                        <div id="app">
-                                            <pie-chart :data="pie_data2" :key="pie_key2"></pie-chart>
-                                        </div>
-                                        <div id="my_dataviz"></div>
-                                    </div>
-                                </vs-card>
-                            </transition>
-                        </vs-col>
-                    </vs-row>
-                </vs-col>
-            </vs-row>
-
-            <vs-row vs-justify='top'>
-                <vs-col type="flex" vs-justify="left" vs-align="left" vs-lg="6" vs-sm="6" vs-xs="12">
-                    <transition mode="out-in" enter-active-class="animate__animated animate__fadeInUp"
-                                leave-active-class="animate__animated animate__fadeOutDown">
-                        <vs-card class="cardx" v-if="fetched.histograms">
-                            <div slot="header"><h3>Distribution of dominant colors: {{ selected_artist }}</h3></div>
-                            <zingchart ref="style_hist" :data="style_hist_data" :key="hist_key"></zingchart>
-                        </vs-card>
-                    </transition>
-                </vs-col>
-
-                <vs-col type="flex" vs-justify="right" vs-align="right" vs-lg="6" vs-sm="6" vs-xs="12">
-                    <transition mode="out-in" enter-active-class="animate__animated animate__fadeInRight"
-                                leave-active-class="animate__animated animate__fadeOutLeft">
-                        <vs-card class="cardx" v-if="fetched.line_chart">
-                            <div slot="header"><h3>Dominant colors over the years: {{ selected_artist }}</h3></div>
-                            <zingchart
-                                    ref="line_chart"
-                                    :data="line_chart_data"
-                                    :key="chart_key"
-                                    @node_mouseover="handleNodeHighlight"
-                            />
-                        </vs-card>
-                    </transition>
-                </vs-col>
-            </vs-row>
-        </div>
-
-        <vs-row>
-            <vs-col type="flex" vs-justify="left" vs-align="left" id="timeline-card" :vs-w="12">
-                <transition name="slide-fade">
-                    <vs-card class="cardx">
+  <div>
+    <div v-if="!compare_mode" class="scale">
+        <vs-row> <vs-col type="flex" vs-justify="left" vs-align="left" vs-lg="4" vs-sm="4" vs-xs="12">
+                <transition mode="out-in" enter-active-class="animate__animated animate__fadeInLeft"
+                            leave-active-class="animate__animated animate__fadeOutRight">
+                    <vs-card class="cardx" v-if="fetched.img_existend" fixedHeight vs-w="5">
                         <div slot="header">
-                            <h3>Pick a <span v-if="fetched.img_generated">new</span> style!</h3>
+                            <h3>Existing Art Pieces: {{ exist_artist }}</h3>
                         </div>
-                        <div class="col-12">
-                            <div class="ml-4 mr-4">
-                                <v-row>
-                                    <v-combobox class="col-md-4 col-5" v-model="pending_add_artists" :items="all_artists"
-                                                label="Add artist(s) to timeline"
-                                                hide-selected small-chips multiple>
-                                        <template v-slot:prepend-inner>
-                                            <v-progress-circular id="add-spinner" :size="20" :width="3"
-                                                                 style="display: none;" indeterminate color="primary">
-                                            </v-progress-circular>
-                                        </template>
-                                        <template v-slot:append>
-                                            <v-btn height="auto" @click="addArtists" text>Add</v-btn>
-                                        </template>
-                                    </v-combobox>
-                                    <v-combobox class="col-md-4 offset-md-1 offset-2 col-5" v-model="pending_remove_artists"
-                                                :items="artists_on_timeline"
-                                                label="Remove artist(s)" hide-selected small-chips
-                                                multiple>
-                                        <template v-slot:prepend-inner>
-                                            <v-progress-circular id="remove-spinner" :size="20" :width="3"
-                                                                 style="display: none;" indeterminate color="primary">
-                                            </v-progress-circular>
-                                        </template>
-                                        <template v-slot:append>
-                                            <v-btn height="auto" @click="removeArtists" text>Remove</v-btn>
-                                        </template>
-                                    </v-combobox>
 
-                                    <div class="col-md-2 offset-md-1 col-12">
-                                        <label class="container">Compare Mode
-                                            <input type="checkbox" id="checkbox" v-model="compare_mode">
-                                            <span class="checkmark"></span>
-                                        </label>
-                                    </div>
-                                </v-row>
-                            </div>
+                        <div slot="media">
+                            <carousel-3d>
+                                <slide v-for="(slide, i) in existend_imgs" :index="i" :key="i">
+                                    <template slot-scope="{ index, isCurrent, leftIndex, rightIndex }">
+                                        <img :data-index="index"
+                                             :class="{ current: isCurrent, onLeft: (leftIndex >= 0), onRight: (rightIndex >= 0) }"
+                                             :src="slide">
+                                    </template>
+                                </slide>
+                            </carousel-3d>
                         </div>
-                        <div class="mt-3" id="timeline">
-                            Painting happy little trees...
+                    </vs-card>
+                </transition>
+            </vs-col>
+
+            <vs-col type="flex" vs-justify="right" vs-align="right" vs-lg="4" vs-sm="4" vs-xs="12" class="mt-sm-0 mt-4">
+                <transition mode="out-in" enter-active-class="animate__animated animate__fadeInDown"
+                            leave-active-class="animate__animated animate__fadeOutUp">
+                    <vs-card class="cardx" v-if="fetched.img_generated" fixedHeight vs-w="5">
+                        <div slot="header">
+                            <h3>Generated Art Piece</h3>
+                        </div>
+
+                        <div slot="media" v-if="fetched.img_generated">
+                            <img v-bind:src="generated_img">
+                        </div>
+                    </vs-card>
+                </transition>
+            </vs-col>
+            <vs-col type="flex" vs-justify="right" vs-align="right"  vs-lg="4" vs-sm="4" vs-xs="12">
+                <transition mode="out-in" enter-active-class="animate__animated animate__fadeInRight"
+                            leave-active-class="animate__animated animate__fadeOutLeft">
+                    <vs-card class="cardx" v-if="fetched.col_generated">
+                        <div slot="header">
+                            <h4>Dominant colors in this painting</h4>
+                        </div>
+
+                        <div>
+                            <div id="app">
+                                <pie-chart :data="pie_data" :key="pie_key"></pie-chart>
+                            </div>
+                            <div id="my_dataviz"></div>
                         </div>
                     </vs-card>
                 </transition>
             </vs-col>
         </vs-row>
+
+        <vs-row :class="fetched.col_generated ? '' : 'mt-4'">
+            <vs-col type="flex" vs-justify="left" vs-align="left" vs-lg="6" vs-sm="6" vs-xs="12">
+                <transition mode="out-in" enter-active-class="animate__animated animate__fadeInRight"
+                            leave-active-class="animate__animated animate__fadeOutLeft">
+                    <vs-card class="cardx" v-if="fetched.summary">
+                        <div slot="header"><h4>{{ genre }} on Wikipedia</h4></div>
+                        <div style="font-size: 11pt">
+                            {{ summary }}
+                        </div>
+                    </vs-card>
+                </transition>
+            </vs-col>
+
+            <vs-col type="flex" vs-justify="right" vs-align="right" vs-lg="6" vs-sm="6" vs-xs="12">
+                <transition name="slide-fade">
+                    <vs-card class="cardx" v-if="fetched.related_terms">
+                        <div slot="header"><h4>Related terms</h4></div>
+                        <div>
+                            {{ related_terms }}
+                        </div>
+                    </vs-card>
+                </transition>
+            </vs-col>
+        </vs-row>
+
+        <vs-row>
+             <vs-col type="flex" vs-justify="left" vs-align="left" vs-lg="6" vs-sm="6" vs-xs="12">
+                <transition mode="out-in" enter-active-class="animate__animated animate__fadeInUp"
+                            leave-active-class="animate__animated animate__fadeOutDown">
+                    <vs-card class="cardx" v-if="fetched.histograms">
+                        <div slot="header"><h3>Distribution of dominant colors: {{ selected_artist }}</h3></div>
+                        <zingchart
+                                ref="style_hist"
+                                :data="style_hist_data"
+                                :key="hist_key"
+                        />
+                    </vs-card>
+                </transition>
+            </vs-col>
+
+            <vs-col type="flex" vs-justify="right" vs-align="right" vs-lg="6" vs-sm="6" vs-xs="12">
+                <transition mode="out-in" enter-active-class="animate__animated animate__fadeInRight"
+                            leave-active-class="animate__animated animate__fadeOutLeft">
+                    <vs-card class="cardx" v-if="fetched.line_chart">
+                        <div slot="header"><h3>Dominant colors over the years: {{ selected_artist }}</h3></div>
+                        <zingchart
+                                ref="line_chart"
+                                :data="line_chart_data"
+                                :key="chart_key"
+                                @node_mouseover="handleNodeHighlight"
+                        />
+                    </vs-card>
+                </transition>
+            </vs-col>
+        </vs-row>
     </div>
+
+
+
+    <div v-if="compare_mode" class="scale">
+        <vs-row vs-justify="top">
+            <vs-col type="flex" vs-justify="left" vs-align="left" vs-lg="6" vs-sm="6" vs-xs="12">
+                <transition mode="out-in" enter-active-class="animate__animated animate__fadeInLeft"
+                            leave-active-class="animate__animated animate__fadeOutRight">
+                    <vs-card class="cardx" style="border-style: solid; border-color:blue; border-width: thin;"
+                             v-if="fetched.img_existend" fixedHeight vs-w="5">
+                        <div slot="header">
+                            <h3>Existing Art Pieces: {{ exist_artist }}</h3>
+                        </div>
+
+                        <div slot="media">
+                            <carousel-3d>
+                                <slide v-for="(slide, i) in existend_imgs" :index="i" :key="i">
+                                    <template slot-scope="{ index, isCurrent, leftIndex, rightIndex }">
+                                        <img :data-index="index"
+                                             :class="{ current: isCurrent, onLeft: (leftIndex >= 0), onRight: (rightIndex >= 0) }"
+                                             :src="slide">
+                                    </template>
+                                </slide>
+                            </carousel-3d>
+                        </div>
+                    </vs-card>
+                </transition>
+            </vs-col>
+
+            <vs-col type="flex" vs-justify="right" vs-align="right" vs-lg="6" vs-sm="6" vs-xs="12" class="mt-sm-0 mt-4">
+                <transition mode="out-in" enter-active-class="animate__animated animate__fadeInRight"
+                            leave-active-class="animate__animated animate__fadeOutRight">
+                    <vs-card class="cardx" style="border-style: solid; border-color:orange; border-width: thin;"
+                             v-if="fetched.img_existend" fixedHeight vs-w="5">
+                        <div slot="header">
+                            <h3>Existing Art Pieces: {{ exist_artist2 }}</h3>
+                        </div>
+
+                        <div slot="media">
+                            <carousel-3d>
+                                <slide v-for="(slide, i) in existend_imgs2" :index="i" :key="i">
+                                    <template slot-scope="{ index, isCurrent, leftIndex, rightIndex }">
+                                        <img :data-index="index"
+                                             :class="{ current: isCurrent, onLeft: (leftIndex >= 0), onRight: (rightIndex >= 0) }"
+                                             :src="slide">
+                                    </template>
+                                </slide>
+                            </carousel-3d>
+                        </div>
+                    </vs-card>
+                </transition>
+            </vs-col>
+        </vs-row>
+
+        <vs-row class="mt-4 mb-4">
+            <vs-col type="flex" vs-justify="left" vs-align="left" vs-lg="6" vs-sm="6" vs-xs="12">
+                <transition mode="out-in" enter-active-class="animate__animated animate__fadeInDown"
+                            leave-active-class="animate__animated animate__fadeOutUp">
+                    <vs-card class="cardx" style="border-style: solid; border-color:blue; border-width: thin;"
+                             v-if="fetched.img_generated" fixedHeight vs-w="5">
+                        <div slot="header">
+                            <h3>Generated Art Piece</h3>
+                        </div>
+
+                        <div slot="media" v-if="fetched.img_generated">
+                            <img v-bind:src="generated_img">
+                        </div>
+                    </vs-card>
+                </transition>
+            </vs-col>
+
+            <vs-col type="flex" vs-justify="right" vs-align="right" vs-lg="6" vs-sm="6" vs-xs="12" class="mt-sm-0 mt-4">
+                <transition mode="out-in" enter-active-class="animate__animated animate__fadeInDown"
+                            leave-active-class="animate__animated animate__fadeOutUp">
+                    <vs-card class="cardx" style="border-style: solid; border-color:orange; border-width: thin;"
+                             v-if="fetched.img_generated" fixedHeight vs-w="5">
+                        <div slot="header">
+                            <h3>Generated Art Piece</h3>
+                        </div>
+
+                        <div slot="media" v-if="fetched.img_generated2">
+                            <img v-bind:src="generated_img2">
+                        </div>
+                    </vs-card>
+                </transition>
+            </vs-col>
+        </vs-row>
+
+        <vs-row vs-justify='top'>
+            <vs-col type="flex" vs-lg="6" vs-sm="6" vs-xs="12">
+                <vs-row>
+                    <vs-col type="flex" vs-justify="flex-start" vs-lg="6" vs-sm="6" vs-xs="12" class="pl-0">
+                            <transition mode="out-in" enter-active-class="animate__animated animate__fadeInRight"
+                                        leave-active-class="animate__animated animate__fadeOutLeft">
+                                <vs-card class="cardx"
+                                         style="border-style: solid; border-color:blue; border-width: thin;"
+                                         v-if="fetched.summary">
+                                    <div slot="header"><h4>{{ genre }} on Wikipedia</h4></div>
+                                    <div style="font-size: 11pt">
+                                        {{ summary }}
+                                    </div>
+                                </vs-card>
+                            </transition>
+                    </vs-col>
+
+                    <vs-col type="flex" vs-justify="flex-end" vs-lg="6" vs-sm="6" vs-xs="12" class="pr-0">
+                        <transition name="slide-fade">
+                            <vs-card class="cardx"
+                                     style="border-style: solid; border-color:blue; border-width: thin;"
+                                     v-if="fetched.related_terms">
+                                <div slot="header"><h4>Related terms {{ genre }} </h4></div>
+                                <div>
+                                    {{ related_terms }}
+                                </div>
+                            </vs-card>
+                        </transition>
+                    </vs-col>
+
+                    <vs-col vs-w="12">
+                        <transition mode="out-in" enter-active-class="animate__animated animate__fadeInRight"
+                            leave-active-class="animate__animated animate__fadeOutLeft">
+                            <vs-card class="cardx" style="border-style: solid; border-color:blue; border-width: thin;"
+                                     v-if="fetched.col_generated">
+                                <div slot="header"><h4>Dominant colors in this painting</h4></div>
+                                <div>
+                                    <div id="app">
+                                        <pie-chart :data="pie_data" :key="pie_key"></pie-chart>
+                                    </div>
+                                    <div id="my_dataviz"></div>
+                                </div>
+                            </vs-card>
+                        </transition>
+                    </vs-col>
+                </vs-row>
+            </vs-col>
+
+            <vs-col type="flex" vs-justify="right" vs-align="right" vs-lg="6" vs-sm="6" vs-xs="12">
+                <vs-row>
+                    <vs-col type="flex" vs-justify="flex-start" vs-lg="6" vs-sm="6" vs-xs="12" class="pl-0">
+                        <transition mode="out-in" enter-active-class="animate__animated animate__fadeInRight"
+                                    leave-active-class="animate__animated animate__fadeOutLeft">
+                            <vs-card class="cardx"
+                                     style="border-style: solid; border-color:orange; border-width: thin;"
+                                     v-if="fetched.summary2">
+                                <div slot="header"><h4>{{ genre2 }} on Wikipedia</h4></div>
+                                <div style="font-size: 11pt">
+                                    {{ summary2 }}
+                                </div>
+                            </vs-card>
+                        </transition>
+                    </vs-col>
+
+                    <vs-col type="flex" vs-justify="flex-end" vs-lg="6" vs-sm="6" vs-xs="12" class="pr-0">
+                        <transition name="slide-fade">
+                            <vs-card class="cardx"
+                                     style="border-style: solid; border-color:orange; border-width: thin;"
+                                     v-if="fetched.related_terms2">
+                                <div slot="header"><h4>Related terms {{ genre2 }}</h4></div>
+                                <div>
+                                    {{ related_terms2 }}
+                                </div>
+                            </vs-card>
+                        </transition>
+                    </vs-col>
+
+                    <vs-col vs-w="12">
+                        <transition mode="out-in" enter-active-class="animate__animated animate__fadeInRight"
+                            leave-active-class="animate__animated animate__fadeOutLeft">
+                            <vs-card class="cardx" style="border-style: solid; border-color:orange; border-width: thin;"
+                                     v-if="fetched.col_generated2">
+                                <div slot="header"><h4>Dominant colors in this painting</h4></div>
+                                <div>
+                                    <div id="app">
+                                        <pie-chart :data="pie_data2" :key="pie_key2"></pie-chart>
+                                    </div>
+                                    <div id="my_dataviz"></div>
+                                </div>
+                            </vs-card>
+                        </transition>
+                    </vs-col>
+                </vs-row>
+            </vs-col>
+        </vs-row>
+
+        <vs-row vs-justify='top'>
+            <vs-col type="flex" vs-justify="left" vs-align="left" vs-lg="6" vs-sm="6" vs-xs="12">
+                <transition mode="out-in" enter-active-class="animate__animated animate__fadeInUp"
+                            leave-active-class="animate__animated animate__fadeOutDown">
+                    <vs-card class="cardx" v-if="fetched.histograms">
+                        <div slot="header"><h3>Distribution of dominant colors: {{ selected_artist }}</h3></div>
+                        <zingchart ref="style_hist" :data="style_hist_data" :key="hist_key"></zingchart>
+                    </vs-card>
+                </transition>
+            </vs-col>
+
+            <vs-col type="flex" vs-justify="right" vs-align="right" vs-lg="6" vs-sm="6" vs-xs="12">
+                <transition mode="out-in" enter-active-class="animate__animated animate__fadeInRight"
+                            leave-active-class="animate__animated animate__fadeOutLeft">
+                    <vs-card class="cardx" v-if="fetched.line_chart">
+                        <div slot="header"><h3>Dominant colors over the years: {{ selected_artist }}</h3></div>
+                        <zingchart
+                                ref="line_chart"
+                                :data="line_chart_data"
+                                :key="chart_key"
+                                @node_mouseover="handleNodeHighlight"
+                        />
+                    </vs-card>
+                </transition>
+            </vs-col>
+        </vs-row>
+    </div>
+
+    <vs-row>
+        <vs-col type="flex" vs-justify="left" vs-align="left" id="timeline-card" :vs-w="12">
+            <transition name="slide-fade">
+                <vs-card class="cardx">
+                    <div slot="header">
+                        <h3>Pick a <span v-if="fetched.img_generated">new</span> style!</h3>
+                    </div>
+                    <div class="col-12">
+                        <div class="ml-4 mr-4">
+                            <v-row>
+                                <v-combobox class="col-md-4 col-5" v-model="pending_add_artists" :items="all_artists"
+                                            label="Add artist(s) to timeline"
+                                            hide-selected small-chips multiple>
+                                    <template v-slot:prepend-inner>
+                                        <v-progress-circular id="add-spinner" :size="20" :width="3"
+                                                             style="display: none;" indeterminate color="primary">
+                                        </v-progress-circular>
+                                    </template>
+                                    <template v-slot:append>
+                                        <v-btn height="auto" @click="addArtists" text>Add</v-btn>
+                                    </template>
+                                </v-combobox>
+                                <v-combobox class="col-md-4 offset-md-1 offset-2 col-5" v-model="pending_remove_artists"
+                                            :items="artists_on_timeline"
+                                            label="Remove artist(s)" hide-selected small-chips
+                                            multiple>
+                                    <template v-slot:prepend-inner>
+                                        <v-progress-circular id="remove-spinner" :size="20" :width="3"
+                                                             style="display: none;" indeterminate color="primary">
+                                        </v-progress-circular>
+                                    </template>
+                                    <template v-slot:append>
+                                        <v-btn height="auto" @click="removeArtists" text>Remove</v-btn>
+                                    </template>
+                                </v-combobox>
+
+                                <div class="col-md-2 offset-md-1 col-12">
+                                    <label class="container">Compare Mode
+                                        <input type="checkbox" id="checkbox" v-model="compare_mode">
+                                        <span class="checkmark"></span>
+                                    </label>
+                                </div>
+                            </v-row>
+                        </div>
+                    </div>
+                    <div class="mt-3" id="timeline">
+                        Painting happy little trees...
+                    </div>
+                </vs-card>
+            </transition>
+        </vs-col>
+    </vs-row>
+  </div>
 </template>
 
 <script>
