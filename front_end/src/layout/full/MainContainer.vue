@@ -27,7 +27,7 @@ export default {
   data:() => ({
     // main_color: "#061765",
     main_color: "#31B59E",
-    logotitle: "ARTIvisual",
+    logotitle: "ArtiVisual",
     socket: null,
     timeline_data: null
   }),

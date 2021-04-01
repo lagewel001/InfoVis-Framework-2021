@@ -45,7 +45,7 @@ from data import *;
                             leave-active-class="animate__animated animate__fadeOutLeft">
                     <vs-card class="cardx" v-if="fetched.col_generated">
                         <div slot="header">
-                            <h4>Dominant colors in this painting</h4>
+                            <h4>Dominant colours in this painting</h4>
                         </div>
 
                         <div>
@@ -89,7 +89,7 @@ from data import *;
                 <transition mode="out-in" enter-active-class="animate__animated animate__fadeInUp"
                             leave-active-class="animate__animated animate__fadeOutDown">
                     <vs-card class="cardx" v-if="fetched.histograms">
-                        <div slot="header"><h3>Distribution of dominant colors: {{ selected_artist }}</h3></div>
+                        <div slot="header"><h3>Distribution of dominant colours: {{ selected_artist }}</h3></div>
                         <zingchart
                                 ref="style_hist"
                                 :data="style_hist_data"
@@ -238,7 +238,7 @@ from data import *;
                           leave-active-class="animate__animated animate__fadeOutLeft">
                           <vs-card class="cardx" style="border-style: solid; border-color:blue; border-width: thin;"
                                    v-if="fetched.col_generated">
-                              <div slot="header"><h4>Dominant colors in this painting</h4></div>
+                              <div slot="header"><h4>Dominant colours in this painting</h4></div>
                               <div>
                                   <div id="app">
                                       <pie-chart :data="pie_data" :key="pie_key"></pie-chart>
@@ -285,7 +285,7 @@ from data import *;
                           leave-active-class="animate__animated animate__fadeOutLeft">
                           <vs-card class="cardx" style="border-style: solid; border-color:orange; border-width: thin;"
                                    v-if="fetched.col_generated2">
-                              <div slot="header"><h4>Dominant colors in this painting</h4></div>
+                              <div slot="header"><h4>Dominant colours in this painting</h4></div>
                               <div>
                                   <div id="app">
                                       <pie-chart :data="pie_data2" :key="pie_key2"></pie-chart>
@@ -304,7 +304,7 @@ from data import *;
               <transition mode="out-in" enter-active-class="animate__animated animate__fadeInUp"
                           leave-active-class="animate__animated animate__fadeOutDown">
                   <vs-card class="cardx" v-if="fetched.histograms">
-                      <div slot="header"><h3>Distribution of dominant colors: {{ selected_artist }}</h3></div>
+                      <div slot="header"><h3>Distribution of dominant colours: {{ selected_artist }}</h3></div>
                       <zingchart ref="style_hist" :data="style_hist_data" :key="hist_key"></zingchart>
                   </vs-card>
               </transition>
@@ -314,7 +314,7 @@ from data import *;
               <transition mode="out-in" enter-active-class="animate__animated animate__fadeInRight"
                           leave-active-class="animate__animated animate__fadeOutLeft">
                   <vs-card class="cardx" v-if="fetched.line_chart">
-                      <div slot="header"><h3>Dominant colors over the years: {{ selected_artist }}</h3></div>
+                      <div slot="header"><h3>Dominant colours over the years: {{ selected_artist }}</h3></div>
                       <zingchart
                               ref="line_chart"
                               :data="line_chart_data"
