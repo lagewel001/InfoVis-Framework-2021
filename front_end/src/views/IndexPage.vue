@@ -133,9 +133,9 @@ from data import *;
                     <carousel-3d>
                         <slide v-for="(slide, i) in existend_imgs" :index="i" :key="i">
                             <template slot-scope="{ index, isCurrent, leftIndex, rightIndex }">
-                                <img :data-index="index"
-                                     :class="{ current: isCurrent, onLeft: (leftIndex >= 0), onRight: (rightIndex >= 0) }"
-                                     :src="slide">
+                              <img :data-index="index"
+                                   :class="{ current: isCurrent, onLeft: (leftIndex >= 0), onRight: (rightIndex >= 0) }"
+                                   :src="slide">
                             </template>
                         </slide>
                     </carousel-3d>
@@ -434,11 +434,9 @@ export default {
         histograms2: false,
       },
       generated_img: "@/assets/images/big/img1.jpg",
-      existend_img: "@/assets/images/big/img1.jpg",
       existend_imgs: [],
       generated_imgs: [],
       generated_img2: "@/assets/images/big/img1.jpg",
-      existend_img2: "@/assets/images/big/img1.jpg",
       existend_imgs2: [],
       generated_imgs2: [],
       exist_title: '',
@@ -937,7 +935,6 @@ async created() {
 mounted: function () {
     this.$parent.socket.on("set_image", (data) => {
         window.scroll({top: 0, left: 0, behaviour: 'smooth'});
-        this.existend_img = data.existend;
         this.existend_imgs = data.existend_imgs;
         this.exist_title = data.title;
         this.exist_artist = data.artist;
@@ -945,7 +942,6 @@ mounted: function () {
         this.fetched.img_existend = true;
 
         if (this.compare) {
-            this.existend_img2 = data.existend2;
             this.existend_imgs2 = data.existend_imgs2;
             this.exist_title2 = data.title2;
             this.exist_artist2 = data.artist2;

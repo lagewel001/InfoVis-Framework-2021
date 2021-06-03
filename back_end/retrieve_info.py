@@ -14,7 +14,7 @@ ART_PERIODS = [
     {"name": "Rococo", "timeRange": [1699, 1780]},
     {"name": "Neoclassicism", "timeRange": [1750, 1850]},
     {"name": "Romanticism", "timeRange": [1780, 1850]},
-    {"name": "Realism", "timeRange": [1848, 1900]},
+    {"name": "Realism (arts)", "timeRange": [1848, 1900]},
     {"name": "Art Nouveau", "timeRange": [1890, 1910]},
     {"name": "Impressionism", "timeRange": [1865, 1885]},
     {"name": "Post-impressionism", "timeRange": [1885, 1910]},

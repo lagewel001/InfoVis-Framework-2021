@@ -289,23 +289,27 @@ def collect_info(data):
     title2 = False
     artist2 = False
     year2 = False
-    encoded_img2 = False
     image_list2 = False
+
+    print("Collecting info", class_type, class_idx)
+    print(data)
 
     # Load a placeholder image.
     # TODO: Obtain a generated image here.
-    image_list, image, title, artist, year = get_image(class_idx, class_type)
+    image_list, url, title, artist, year = get_image(class_idx, class_type)
     # path = os.path.join(os.path.dirname(__file__), image_file)
     # image = Image.open(urllib3.urlopen(image))
+    print(url, image_list)
+
     try:
-        image = Image.open(urllib.request.urlopen(image))
+        image = Image.open(urllib.request.urlopen(url))
     except urllib.error.HTTPError:
+        print(f"Could not download image at url '{url}'.")
         image = Image.new('RGB', (1, 1))
 
     # Encode the image for the response.
     img_stream = BytesIO()
     image.save(img_stream, format="png")
-    encoded_img = encodebytes(img_stream.getvalue()).decode('ascii')
 
     if compare:
         image_list2, image2, title2, artist2, year2 = get_image(
@@ -315,15 +319,12 @@ def collect_info(data):
         # Encode the image for the response.
         img_stream2 = BytesIO()
         image2.save(img_stream2, format="png")
-        encoded_img2 = encodebytes(img_stream2.getvalue()).decode('ascii')
 
     socketio.emit("set_image", {
-            "existend": f"data:image/png;base64, {encoded_img}",
             "existend_imgs": image_list,
             "title": title,
             "artist": artist,
             "year": year,
-            "existend2": f"data:image/png;base64, {encoded_img2}",
             "existend_imgs2": image_list2,
             "title2": title2,
             "artist2": artist2,
