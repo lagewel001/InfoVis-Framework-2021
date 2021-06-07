@@ -292,14 +292,12 @@ def collect_info(data):
     image_list2 = False
 
     print("Collecting info", class_type, class_idx)
-    print(data)
 
     # Load a placeholder image.
     # TODO: Obtain a generated image here.
     image_list, url, title, artist, year = get_image(class_idx, class_type)
     # path = os.path.join(os.path.dirname(__file__), image_file)
     # image = Image.open(urllib3.urlopen(image))
-    print(url, image_list)
 
     try:
         image = Image.open(urllib.request.urlopen(url))

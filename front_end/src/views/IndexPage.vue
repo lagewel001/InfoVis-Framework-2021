@@ -6,7 +6,7 @@ from data import *;
         <vs-row> <vs-col type="flex" vs-justify="left" vs-align="left" vs-lg="4" vs-sm="4" vs-xs="12">
                 <transition mode="out-in" enter-active-class="animate__animated animate__fadeInLeft"
                             leave-active-class="animate__animated animate__fadeOutRight">
-                    <vs-card class="cardx" v-if="fetched.img_existend" fixedHeight vs-w="5">
+                    <vs-card class="cardx" v-if="fetched.img_existend">
                         <div slot="header">
                             <h3>Existing Art Pieces: {{ exist_artist }}</h3>
                         </div>
@@ -27,18 +27,26 @@ from data import *;
             </vs-col>
 
             <vs-col type="flex" vs-justify="right" vs-align="right" vs-lg="4" vs-sm="4" vs-xs="12" class="mt-sm-0 mt-4">
-                <transition mode="out-in" enter-active-class="animate__animated animate__fadeInDown"
-                            leave-active-class="animate__animated animate__fadeOutUp">
-                    <vs-card class="cardx" v-if="fetched.img_generated" fixedHeight vs-w="5">
-                        <div slot="header">
-                            <h3>Generated Art Piece</h3>
-                        </div>
+              <transition mode="out-in" enter-active-class="animate__animated animate__fadeInDown"
+                          leave-active-class="animate__animated animate__fadeOutUp">
+                <vs-card class="cardx" v-if="fetched.img_generated">
+                  <div slot="header">
+                      <h3>Generated Art Piece</h3>
+                  </div>
 
-                        <div slot="media" v-if="fetched.img_generated">
-                            <img v-bind:src="generated_img">
-                        </div>
-                    </vs-card>
-                </transition>
+                  <div slot="media">
+                    <carousel-3d>
+                      <slide v-for="(slide, i) in generated_imgs" :index="i" :key="i">
+                        <template slot-scope="{ index, isCurrent, leftIndex, rightIndex }">
+                          <img :data-index="index"
+                               :class="{ current: isCurrent, onLeft: (leftIndex >= 0), onRight: (rightIndex >= 0) }"
+                               :src="slide">
+                        </template>
+                      </slide>
+                    </carousel-3d>
+                  </div>
+                </vs-card>
+              </transition>
             </vs-col>
             <vs-col type="flex" vs-justify="right" vs-align="right"  vs-lg="4" vs-sm="4" vs-xs="12">
                 <transition mode="out-in" enter-active-class="animate__animated animate__fadeInRight"
@@ -174,14 +182,21 @@ from data import *;
               <transition mode="out-in" enter-active-class="animate__animated animate__fadeInDown"
                           leave-active-class="animate__animated animate__fadeOutUp">
                   <vs-card class="cardx" style="border-style: solid; border-color:blue; border-width: thin;"
-                           v-if="fetched.img_generated" fixedHeight vs-w="5">
-                      <div slot="header">
-                          <h3>Generated Art Piece</h3>
-                      </div>
-
-                      <div slot="media" v-if="fetched.img_generated">
-                          <img v-bind:src="generated_img">
-                      </div>
+                           v-if="fetched.img_generated">
+                    <div slot="header">
+                      <h3>Generated Art Piece</h3>
+                    </div>
+                    <div slot="media">
+                      <carousel-3d>
+                        <slide v-for="(slide, i) in generated_imgs" :index="i" :key="i">
+                          <template slot-scope="{ index, isCurrent, leftIndex, rightIndex }">
+                            <img :data-index="index"
+                                 :class="{ current: isCurrent, onLeft: (leftIndex >= 0), onRight: (rightIndex >= 0) }"
+                                 :src="slide">
+                          </template>
+                        </slide>
+                      </carousel-3d>
+                    </div>
                   </vs-card>
               </transition>
           </vs-col>
@@ -190,14 +205,21 @@ from data import *;
               <transition mode="out-in" enter-active-class="animate__animated animate__fadeInDown"
                           leave-active-class="animate__animated animate__fadeOutUp">
                   <vs-card class="cardx" style="border-style: solid; border-color:orange; border-width: thin;"
-                           v-if="fetched.img_generated" fixedHeight vs-w="5">
-                      <div slot="header">
-                          <h3>Generated Art Piece</h3>
-                      </div>
-
-                      <div slot="media" v-if="fetched.img_generated2">
-                          <img v-bind:src="generated_img2">
-                      </div>
+                           v-if="fetched.img_generated">
+                    <div slot="header">
+                      <h3>Generated Art Piece</h3>
+                    </div>
+                    <div slot="media">
+                      <carousel-3d>
+                        <slide v-for="(slide, i) in generated_imgs2" :index="i" :key="i">
+                          <template slot-scope="{ index, isCurrent, leftIndex, rightIndex }">
+                            <img :data-index="index"
+                                 :class="{ current: isCurrent, onLeft: (leftIndex >= 0), onRight: (rightIndex >= 0) }"
+                                 :src="slide">
+                          </template>
+                        </slide>
+                      </carousel-3d>
+                    </div>
                   </vs-card>
               </transition>
           </vs-col>
@@ -663,7 +685,7 @@ methods: {
                                 this.$parent.socket.emit("generate_images", {
                                     type: "artists",
                                     compare: true,
-                                    amount: 1,
+                                    amount: 7,
                                     class_idx: filters[0],
                                     class_idx2: filters[1],
                                 });
@@ -729,7 +751,7 @@ methods: {
                                 this.$parent.socket.emit("generate_images", {
                                     compare: false,
                                     type: "artists",
-                                    amount: 1,
+                                    amount: 7,
                                     class_idx: filters[filters.length - 1],
                                     class_idx2: false
                                 });
@@ -800,7 +822,7 @@ methods: {
                         this.$parent.socket.emit("generate_images", {
                             compare: false,
                             type: "centuries",
-                            amount: 1,
+                            amount: 7,
                             class_idx: century,
                             class_idx2: false,
                         });
@@ -826,7 +848,7 @@ methods: {
                         this.$parent.socket.emit("generate_images", {
                             compare: true,
                             type: "centuries",
-                            amount: 1,
+                            amount: 7,
                             class_idx: century,
                             class_idx2: century2,
                         });
@@ -851,7 +873,7 @@ methods: {
                         this.$parent.socket.emit("generate_images", {
                             compare: false,
                             type: "artists",
-                            amount: 1,
+                            amount: 7,
                             class_idx: s.val,
                             class_idx2: false,
                         });
@@ -869,7 +891,7 @@ methods: {
                         this.$parent.socket.emit("generate_images", {
                             compare: true,
                             type: "artists",
-                            amount: 1,
+                            amount: 7,
                             class_idx: s.val,
                             class_idx2: s.val2,
                         });
@@ -999,10 +1021,8 @@ mounted: function () {
     // });
 
     this.$parent.socket.on("collect_scatter_data", (data) => {
-      console.log(data);
       this.line_chart_data.series = data.series;
       this.line_chart_data.plot.marker = data.plot.marker;
-      console.log(this.line_chart_data);
       this.fetched.line_chart = true;
       this.chart_key += 1;
       // if(this.compare) {
@@ -1017,17 +1037,25 @@ mounted: function () {
     this.$parent.socket.on("images_generated", (data) => {
         console.log("Received generated image", data);
         if (data.success) {
-            this.generated_img = data.images[0].image;
-            if (this.compare) {
-                this.generated_img2 = data.images2[0].image;
-                this.fetched.img_generated2 = true;
-            }
+          var images = [];
+          data.images.forEach(image => {images.push(image.image)});
+          this.generated_imgs = images;
+
+          // this.generated_img = data.images[0].image;
+          if (this.compare) {
+            var images2 = [];
+            data.images2.forEach(image => {images2.push(image.image)});
+            this.generated_imgs2 = images2;
+
+            // this.generated_img2 = data.images2[0].image;
+            this.fetched.img_generated2 = true;
+          }
         } else {
-            this.generated_img = "@/assets/images/big/img1.jpg";
-            if (this.compare) {
-                this.generated_img2 = "@/assets/images/big/img1.jpg";
-                this.fetched.img_generated2 = true;
-            }
+          this.generated_imgs = ["@/assets/images/big/img1.jpg"];
+          if (this.compare) {
+            this.generated_imgs2 = ["@/assets/images/big/img1.jpg"];
+            this.fetched.img_generated2 = true;
+          }
         }
         this.fetched.img_generated = true;
     });
