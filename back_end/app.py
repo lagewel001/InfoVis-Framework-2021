@@ -357,6 +357,86 @@ def collect_info(data):
 
 
 @socketio.event
+def generate_images2(data):
+    side = data['compare_side']
+
+    if not torch.cuda.is_available():
+        socketio.emit("images_generated", {
+            "images": [],
+            "seeds": [],
+            "compare_side": side,
+            "success": False,
+            "message": "No Graphical Processing Unit available!"
+        })
+        return
+
+    classification_type = data["type"]
+    amount = data["amount"]
+    class_idx = data["class_idx"]
+
+    seeds = np.random.randint(0, 10000, amount)
+
+    if classification_type == "artists":
+        try:
+            class_idx = generate.ARTIST_LABELS.index(class_idx)
+        except ValueError:
+            message = f"Label {repr(class_idx)} does not exist!"
+            socketio.emit("images_generated", {
+                "images": [],
+                "seeds": [],
+                "compare_side": side,
+                "success": False,
+                "message": message,
+            })
+            raise ValueError(message)
+
+        images = generate.generate_images(G_artists, seeds, class_idx)
+    elif classification_type == "centuries":
+        # print(f"Generating painting from the {class_idx}th century")
+        images = generate.generate_images(G_centuries, seeds, class_idx)
+    else:
+        message = f"Type {repr(classification_type)} is not known!"
+        socketio.emit("images_generated", {
+            "images": [],
+            "seeds": [],
+            "compare_side": side,
+            "success": False,
+            "message": message
+        })
+        raise ValueError(message)
+
+    image_data = []
+
+    for image in images:
+        colors, percentages, dom_color = detect_colors(image)
+
+        image_data.append({
+            'image': encode_image(image),
+            'dominant_color': dom_color,
+            'color_palette': colors,
+            'color_distribution': percentages,
+        })
+
+    '''
+    first_image = image_data[0]
+    socketio.emit("change_color", first_image['dominant_color'])
+    socketio.emit("set_color_pie", {
+        "colors": first_image['color_palette'],
+        "percentages": first_image['color_distribution'],
+        "artist": 'left',
+    })
+    '''
+
+    socketio.emit("images_generated", {
+        "images": image_data,
+        "seeds": seeds.tolist(),
+        "compare_side": side,
+        "success": True,
+        "message": ""
+    })
+
+
+@socketio.event
 def generate_images(data):
     if not torch.cuda.is_available():
         socketio.emit("images_generated", {
@@ -430,6 +510,7 @@ def generate_images(data):
     socketio.emit("set_color_pie", {
         "colors": first_image['color_palette'],
         "percentages": first_image['color_distribution'],
+        "artist": 'left',
     })
 
     if compare:
@@ -447,6 +528,7 @@ def generate_images(data):
         socketio.emit("set_color_pie2", {
             "colors": first_image2['color_palette'],
             "percentages": first_image2['color_distribution'],
+            "artist": "right",
         })
 
     socketio.emit("images_generated", {
