@@ -2,13 +2,14 @@ from data import *;
 
 <template>
   <div>
+    <!-- Standard Mode -->
     <div v-if="!compare_mode" class="scale">
-        <vs-row> <vs-col type="flex" vs-justify="left" vs-align="left" vs-lg="4" vs-sm="4" vs-xs="12">
+        <vs-row> <vs-col type="flex" vs-justify="left" vs-align="left" vs-lg="6" vs-sm="6" vs-xs="12">
                 <transition mode="out-in" enter-active-class="animate__animated animate__fadeInLeft"
                             leave-active-class="animate__animated animate__fadeOutRight">
                     <vs-card class="cardx" v-if="fetched.img_existend">
                         <div slot="header">
-                            <h3>Existing Art Pieces: {{ exist_artist }}</h3>
+                            <h3>Existing Art Pieces: {{ genre }}</h3>
                         </div>
 
                         <div slot="media">
@@ -26,7 +27,7 @@ from data import *;
                 </transition>
             </vs-col>
 
-            <vs-col type="flex" vs-justify="right" vs-align="right" vs-lg="4" vs-sm="4" vs-xs="12" class="mt-sm-0 mt-4">
+            <vs-col type="flex" vs-justify="right" vs-align="right" vs-lg="6" vs-sm="6" vs-xs="12" class="mt-sm-0 mt-4">
               <transition mode="out-in" enter-active-class="animate__animated animate__fadeInDown"
                           leave-active-class="animate__animated animate__fadeOutUp">
                 <vs-card class="cardx" v-if="fetched.img_generated">
@@ -38,9 +39,10 @@ from data import *;
                     <carousel-3d>
                       <slide v-for="(slide, i) in generated_imgs" :index="i" :key="i">
                         <template slot-scope="{ index, isCurrent, leftIndex, rightIndex }">
-                          <img :data-index="index"
-                               :class="{ current: isCurrent, onLeft: (leftIndex >= 0), onRight: (rightIndex >= 0) }"
-                               :src="slide">
+                          <img
+                            :data-index="index"
+                            :class="{ current: isCurrent, onLeft: (leftIndex >= 0), onRight: (rightIndex >= 0) }"
+                            :src="slide">
                         </template>
                       </slide>
                     </carousel-3d>
@@ -48,27 +50,34 @@ from data import *;
                 </vs-card>
               </transition>
             </vs-col>
-            <vs-col type="flex" vs-justify="right" vs-align="right"  vs-lg="4" vs-sm="4" vs-xs="12">
-                <transition mode="out-in" enter-active-class="animate__animated animate__fadeInRight"
-                            leave-active-class="animate__animated animate__fadeOutLeft">
-                    <vs-card class="cardx" v-if="fetched.col_generated">
-                        <div slot="header">
-                            <h4>Dominant colours in this painting</h4>
-                        </div>
-
-                        <div>
-                            <div id="app">
-                                <pie-chart :data="pie_data" :key="pie_key"></pie-chart>
-                            </div>
-                            <div id="my_dataviz"></div>
-                        </div>
-                    </vs-card>
-                </transition>
-            </vs-col>
         </vs-row>
 
         <vs-row :class="fetched.col_generated ? '' : 'mt-4'">
-            <vs-col type="flex" vs-justify="left" vs-align="left" vs-lg="6" vs-sm="6" vs-xs="12">
+          <vs-col type="flex" vss-justify="left" vs-align="left" vs-lg="2" vs-sm="2" vs-xs="12">
+            <vs-card class="cardx" v-if="fetched.col_generated">
+              <div slot="header"><h4>Colours in existing works</h4></div>
+              <div slot="media">
+                <pie-chart
+                  :data="pie_data"
+                  :options="pie_options"
+                  :key="pie_key">
+                </pie-chart>
+              </div>
+            </vs-card>
+          </vs-col>
+          <vs-col type="flex" vss-justify="left" vs-align="left" vs-lg="2" vs-sm="2" vs-xs="12">
+            <vs-card class="cardx" v-if="fetched.col_generated">
+              <div slot="header"><h4>Colours in generated works</h4></div>
+              <div slot="media">
+                <pie-chart
+                  :data="pie_data"
+                  :options="pie_options"
+                  :key="pie_key">
+                </pie-chart>
+              </div>
+            </vs-card>
+          </vs-col>
+            <vs-col type="flex" vs-justify="left" vs-align="left" vs-lg="8" vs-sm="8" vs-xs="12">
                 <transition mode="out-in" enter-active-class="animate__animated animate__fadeInRight"
                             leave-active-class="animate__animated animate__fadeOutLeft">
                     <vs-card class="cardx" v-if="fetched.summary">
@@ -78,11 +87,8 @@ from data import *;
                         </div>
                     </vs-card>
                 </transition>
-            </vs-col>
-
-            <vs-col type="flex" vs-justify="right" vs-align="right" vs-lg="6" vs-sm="6" vs-xs="12">
                 <transition name="slide-fade">
-                    <vs-card class="cardx" v-if="fetched.related_terms">
+                    <vs-card class="cardx" v-if="fetched.related_terms" height="100%">
                         <div slot="header"><h4>Related terms</h4></div>
                         <div>
                             {{ related_terms }}
@@ -97,7 +103,7 @@ from data import *;
                 <transition mode="out-in" enter-active-class="animate__animated animate__fadeInUp"
                             leave-active-class="animate__animated animate__fadeOutDown">
                     <vs-card class="cardx" v-if="fetched.histograms">
-                        <div slot="header"><h3>Distribution of dominant colours: {{ selected_artist }}</h3></div>
+                        <div slot="header"><h3>Distribution of dominant colours: {{ genre }}</h3></div>
                         <zingchart
                                 ref="style_hist"
                                 :data="style_hist_data"
@@ -111,7 +117,7 @@ from data import *;
                 <transition mode="out-in" enter-active-class="animate__animated animate__fadeInRight"
                             leave-active-class="animate__animated animate__fadeOutLeft">
                     <vs-card class="cardx" v-if="fetched.line_chart">
-                        <div slot="header"><h3>Dominant colors over the years: {{ selected_artist }}</h3></div>
+                        <div slot="header"><h3>Dominant colors over the years: {{ genre }}</h3></div>
                         <zingchart
                                 ref="line_chart"
                                 :data="line_chart_data"
@@ -124,9 +130,9 @@ from data import *;
         </vs-row>
     </div>
 
-
-
+    <!-- Compare Mode -->
     <div v-if="compare_mode" class="scale">
+      <!-- -->
       <vs-row vs-justify="top">
         <vs-col type="flex" vs-justify="left" vs-align="left" vs-lg="6" vs-sm="6" vs-xs="12">
           <transition mode="out-in" enter-active-class="animate__animated animate__fadeInLeft"
@@ -134,7 +140,7 @@ from data import *;
             <vs-card class="cardx" style="border-style: solid; border-color:blue; border-width: thin;"
                      v-if="fetched.img_existend" fixedHeight vs-w="5">
                 <div slot="header">
-                    <h3>Existing Art Pieces: {{ exist_artist }}</h3>
+                    <h3>Existing Art Pieces: {{ genre }}</h3>
                 </div>
 
                 <div slot="media">
@@ -177,6 +183,7 @@ from data import *;
         </vs-col>
       </vs-row>
 
+      <!-- -->
       <vs-row class="mt-4 mb-4">
           <vs-col type="flex" vs-justify="left" vs-align="left" vs-lg="6" vs-sm="6" vs-xs="12">
               <transition mode="out-in" enter-active-class="animate__animated animate__fadeInDown"
@@ -225,67 +232,155 @@ from data import *;
           </vs-col>
       </vs-row>
 
+      <!-- Wikipedia and piecharts -->
       <vs-row vs-justify='top'>
+          <!-- Left artist -->
           <vs-col type="flex" vs-lg="6" vs-sm="6" vs-xs="12">
-              <vs-row>
-                  <vs-col type="flex" vs-justify="flex-start" vs-lg="6" vs-sm="6" vs-xs="12" class="pl-0">
-                          <transition mode="out-in" enter-active-class="animate__animated animate__fadeInRight"
-                                      leave-active-class="animate__animated animate__fadeOutLeft">
-                              <vs-card class="cardx"
-                                       style="border-style: solid; border-color:blue; border-width: thin;"
-                                       v-if="fetched.summary">
-                                  <div slot="header"><h4>{{ genre }} on Wikipedia</h4></div>
-                                  <div style="font-size: 11pt">
-                                      {{ summary }}
-                                  </div>
-                              </vs-card>
-                          </transition>
-                  </vs-col>
-
-                  <vs-col type="flex" vs-justify="flex-end" vs-lg="6" vs-sm="6" vs-xs="12" class="pr-0">
-                      <transition name="slide-fade">
-                          <vs-card class="cardx"
-                                   style="border-style: solid; border-color:blue; border-width: thin;"
-                                   v-if="fetched.related_terms">
-                              <div slot="header"><h4>Related terms {{ genre }} </h4></div>
-                              <div>
-                                  {{ related_terms }}
-                              </div>
-                          </vs-card>
-                      </transition>
-                  </vs-col>
-
-                  <vs-col vs-w="12">
-                      <transition mode="out-in" enter-active-class="animate__animated animate__fadeInRight"
-                          leave-active-class="animate__animated animate__fadeOutLeft">
-                          <vs-card class="cardx" style="border-style: solid; border-color:blue; border-width: thin;"
-                                   v-if="fetched.col_generated">
-                              <div slot="header"><h4>Dominant colours in this painting</h4></div>
-                              <div>
-                                  <div id="app">
-                                      <pie-chart :data="pie_data" :key="pie_key"></pie-chart>
-                                  </div>
-                                  <div id="my_dataviz"></div>
-                              </div>
-                          </vs-card>
-                      </transition>
-                  </vs-col>
-              </vs-row>
+            <vs-row>
+              <vs-col type="flex" vs-justify="flex-start" vs-lg="4" vs-sm="4" vs-xs="12" class="pl-0">
+                <transition
+                  mode="out-in"
+                  enter-active-class="animate__animated animate__fadeInRight"
+                  leave-active-class="animate__animated animate__fadeOutLeft">
+                  <vs-card
+                    class="cardx"
+                    style="border-style: solid; border-color:blue; border-width: thin;"
+                    v-if="fetched.col_generated">
+                    <div slot="header"><h4>Colours in existing works</h4></div>
+                    <div slot="media">
+                      <pie-chart
+                        :data="pie_data"
+                        :options="pie_options"
+                        :key="pie_key">
+                      </pie-chart>
+                    </div>
+                  </vs-card>
+                </transition>
+                <transition
+                  mode="out-in"
+                  enter-active-class="animate__animated animate__fadeInRight"
+                  leave-active-class="animate__animated animate__fadeOutLeft">
+                  <vs-card
+                    class="cardx"
+                    style="border-style: solid; border-color:blue; border-width: thin;"
+                    v-if="fetched.col_generated">
+                    <div slot="header"><h4>Colours in generated works</h4></div>
+                    <div slot="media">
+                      <pie-chart
+                        :data="pie_data"
+                        :options="pie_options"
+                        :key="pie_key">
+                      </pie-chart>
+                    </div>
+                  </vs-card>
+                </transition>
+              </vs-col>
+              <vs-col type="flex" vs-justify="flex-start" vs-lg="8" vs-sm="8" vs-xs="12" class="pl-0">
+                <transition mode="out-in" enter-active-class="animate__animated animate__fadeInRight"
+                            leave-active-class="animate__animated animate__fadeOutLeft">
+                  <vs-card class="cardx"
+                           style="border-style: solid; border-color:blue; border-width: thin;"
+                           v-if="fetched.summary">
+                    <div slot="header"><h4>{{ genre }} on Wikipedia</h4></div>
+                    <div style="font-size: 11pt">
+                        {{ summary }}
+                    </div>
+                  </vs-card>
+                </transition>
+                <transition name="slide-fade">
+                  <vs-card class="cardx"
+                           style="border-style: solid; border-color:blue; border-width: thin;"
+                           v-if="fetched.related_terms">
+                    <div slot="header"><h4>Related terms {{ genre }} </h4></div>
+                    <div>
+                      {{ related_terms }}
+                    </div>
+                  </vs-card>
+                </transition>
+              </vs-col>
+            </vs-row>
           </vs-col>
 
+          <!-- Right artist -->
+          <vs-col type="flex" vs-lg="6" vs-sm="6" vs-xs="12">
+            <vs-row>
+              <vs-col type="flex" vs-justify="flex-start" vs-lg="4" vs-sm="4" vs-xs="12" class="pl-0">
+                <transition
+                  mode="out-in"
+                  enter-active-class="animate__animated animate__fadeInRight"
+                  leave-active-class="animate__animated animate__fadeOutLeft">
+                  <vs-card
+                    class="cardx"
+                    style="border-style: solid; border-color:blue; border-width: thin;"
+                    v-if="fetched.col_generated">
+                    <div slot="header"><h4>Colours in existing works</h4></div>
+                    <div slot="media">
+                      <pie-chart
+                        :data="pie_data2"
+                        :options="pie_options"
+                        :key="pie_key2">
+                      </pie-chart>
+                    </div>
+                  </vs-card>
+                </transition>
+                <transition
+                  mode="out-in"
+                  enter-active-class="animate__animated animate__fadeInRight"
+                  leave-active-class="animate__animated animate__fadeOutLeft">
+                  <vs-card
+                    class="cardx"
+                    style="border-style: solid; border-color:blue; border-width: thin;"
+                    v-if="fetched.col_generated">
+                    <div slot="header"><h4>Colours in generated works</h4></div>
+                    <div slot="media">
+                      <pie-chart
+                        :data="pie_data2"
+                        :options="pie_options"
+                        :key="pie_key2">
+                      </pie-chart>
+                    </div>
+                  </vs-card>
+                </transition>
+              </vs-col>
+              <vs-col type="flex" vs-justify="flex-start" vs-lg="8" vs-sm="8" vs-xs="12" class="pl-0">
+                <transition mode="out-in" enter-active-class="animate__animated animate__fadeInRight"
+                            leave-active-class="animate__animated animate__fadeOutLeft">
+                  <vs-card class="cardx"
+                           style="border-style: solid; border-color:blue; border-width: thin;"
+                           v-if="fetched.summary">
+                    <div slot="header"><h4>{{ genre2 }} on Wikipedia</h4></div>
+                    <div style="font-size: 11pt">
+                        {{ summary2 }}
+                    </div>
+                  </vs-card>
+                </transition>
+                <transition name="slide-fade">
+                  <vs-card class="cardx"
+                           style="border-style: solid; border-color:blue; border-width: thin;"
+                           v-if="fetched.related_terms">
+                    <div slot="header"><h4>Related terms {{ genre2 }} </h4></div>
+                    <div>
+                      {{ related_terms2 }}
+                    </div>
+                  </vs-card>
+                </transition>
+              </vs-col>
+            </vs-row>
+          </vs-col>
+          <!--
           <vs-col type="flex" vs-justify="right" vs-align="right" vs-lg="6" vs-sm="6" vs-xs="12">
               <vs-row>
                   <vs-col type="flex" vs-justify="flex-start" vs-lg="6" vs-sm="6" vs-xs="12" class="pl-0">
                       <transition mode="out-in" enter-active-class="animate__animated animate__fadeInRight"
                                   leave-active-class="animate__animated animate__fadeOutLeft">
-                          <vs-card class="cardx"
-                                   style="border-style: solid; border-color:orange; border-width: thin;"
-                                   v-if="fetched.summary2">
-                              <div slot="header"><h4>{{ genre2 }} on Wikipedia</h4></div>
-                              <div style="font-size: 11pt">
-                                  {{ summary2 }}
-                              </div>
-                          </vs-card>
+                        <vs-card class="cardx"
+                                 style="border-style: solid; border-color:orange; border-width: thin;"
+                                 v-if="fetched.summary2">
+                          <div slot="header"><h4>{{ genre2 }} on Wikipedia</h4></div>
+                          <div style="font-size: 11pt">
+                              {{ summary2 }}
+                          </div>
+                        </vs-card>
                       </transition>
                   </vs-col>
 
@@ -319,8 +414,10 @@ from data import *;
                   </vs-col>
               </vs-row>
           </vs-col>
+          -->
       </vs-row>
 
+      <!-- Charts -->
       <vs-row vs-justify='top'>
           <vs-col type="flex" vs-justify="left" vs-align="left" vs-lg="6" vs-sm="6" vs-xs="12">
               <transition mode="out-in" enter-active-class="animate__animated animate__fadeInUp"
@@ -349,6 +446,7 @@ from data import *;
       </vs-row>
     </div>
 
+    <!-- Timeline -->
     <vs-row>
         <vs-col type="flex" vs-justify="left" vs-align="left" id="timeline-card" :vs-w="12">
             <transition name="slide-fade">
@@ -495,29 +593,25 @@ export default {
             // y: "68%",
         }
       },
+      pie_options: {
+        responsive: true,
+        aspectRatio: 1,
+        legend: { display: false },
+      },
       pie_data: {
-        hoverBackgroundColor: "blue",
-        hoverBorderWidth: 10,
         labels: ["#e5856d", "#5e2812", "#e56b18", "#f6bab7", "#973f28"],
-        datasets: [
-            {
-                label: "Data One",
-                backgroundColor: ["#e5856d", "#5e2812", "#e56b18", "#f6bab7", "#973f28"],
-                data: [0.27, 0.14, 0.16, 0.22, 0.21]
-            }
-        ]
+        datasets: [{
+          backgroundColor: ["#e5856d", "#5e2812", "#e56b18", "#f6bab7", "#973f28"],
+          data: [0.27, 0.14, 0.16, 0.22, 0.21],
+        }]
       },
       pie_data2: {
-        hoverBackgroundColor: "blue",
-        hoverBorderWidth: 10,
         labels: ["#e5856d", "#5e2812", "#e56b18", "#f6bab7", "#973f28"],
-        datasets: [
-            {
-                label: "Data One",
-                backgroundColor: ["#e5856d", "#5e2812", "#e56b18", "#f6bab7", "#973f28"],
-                data: [0.27, 0.14, 0.16, 0.22, 0.21]
-            }
-        ]
+        datasets: [{
+          label: "Data One",
+          backgroundColor: ["#e5856d", "#5e2812", "#e56b18", "#f6bab7", "#973f28"],
+          data: [0.27, 0.14, 0.16, 0.22, 0.21]
+        }]
       },
       style_hist_data: {
         type: 'hbar',
@@ -587,22 +681,22 @@ export default {
       artists_on_timeline: [],
       pending_remove_artists: [],
       artPeriods: [
-          {"name": "Medieval", "timeRange": [new Date(500, 1, 1), new Date(1400, 1, 1)]},
-          {"name": "Renaissance", "timeRange": [new Date(1400, 1, 1), new Date(1500, 1, 1)]},
-          {"name": "Mannerism", "timeRange": [new Date(1527, 1, 1), new Date(1580, 1, 1)]},
-          {"name": "Baroque", "timeRange": [new Date(1600, 1, 1), new Date(1750, 1, 1)]},
-          {"name": "Rococo", "timeRange": [new Date(1699, 1, 1), new Date(1780, 1, 1)]},
-          {"name": "Neoclassicism", "timeRange": [new Date(1750, 1, 1), new Date(1850, 1, 1)]},
-          {"name": "Romanticism", "timeRange": [new Date(1780, 1, 1), new Date(1850, 1, 1)]},
-          {"name": "Realism", "timeRange": [new Date(1848, 1, 1), new Date(1900, 1, 1)]},
-          {"name": "Art Nouveau", "timeRange": [new Date(1890, 1, 1), new Date(1910, 1, 1)]},
-          {"name": "Impressionism", "timeRange": [new Date(1865, 1, 1), new Date(1885, 1, 1)]},
-          {"name": "Post-impressionism", "timeRange": [new Date(1885, 1, 1), new Date(1910, 1, 1)]},
-          {"name": "Fauvism", "timeRange": [new Date(1900, 1, 1), new Date(1935, 1, 1)]},
-          {"name": "Expressionism", "timeRange": [new Date(1905, 1, 1), new Date(1920, 1, 1)]},
-          {"name": "Cubism", "timeRange": [new Date(1907, 1, 1), new Date(1914, 1, 1)]},
-          {"name": "Surrealism", "timeRange": [new Date(1917, 1, 1), new Date(1950, 1, 1)]},
-          {"name": "Modern", "timeRange": [new Date(1950, 1, 1), new Date(2022, 1, 1)]},
+        {"name": "Medieval", "timeRange": [new Date(500, 1, 1), new Date(1400, 1, 1)]},
+        {"name": "Renaissance", "timeRange": [new Date(1400, 1, 1), new Date(1500, 1, 1)]},
+        {"name": "Mannerism", "timeRange": [new Date(1527, 1, 1), new Date(1580, 1, 1)]},
+        {"name": "Baroque", "timeRange": [new Date(1600, 1, 1), new Date(1750, 1, 1)]},
+        {"name": "Rococo", "timeRange": [new Date(1699, 1, 1), new Date(1780, 1, 1)]},
+        {"name": "Neoclassicism", "timeRange": [new Date(1750, 1, 1), new Date(1850, 1, 1)]},
+        {"name": "Romanticism", "timeRange": [new Date(1780, 1, 1), new Date(1850, 1, 1)]},
+        {"name": "Realism", "timeRange": [new Date(1848, 1, 1), new Date(1900, 1, 1)]},
+        {"name": "Art Nouveau", "timeRange": [new Date(1890, 1, 1), new Date(1910, 1, 1)]},
+        {"name": "Impressionism", "timeRange": [new Date(1865, 1, 1), new Date(1885, 1, 1)]},
+        {"name": "Post-impressionism", "timeRange": [new Date(1885, 1, 1), new Date(1910, 1, 1)]},
+        {"name": "Fauvism", "timeRange": [new Date(1900, 1, 1), new Date(1935, 1, 1)]},
+        {"name": "Expressionism", "timeRange": [new Date(1905, 1, 1), new Date(1920, 1, 1)]},
+        {"name": "Cubism", "timeRange": [new Date(1907, 1, 1), new Date(1914, 1, 1)]},
+        {"name": "Surrealism", "timeRange": [new Date(1917, 1, 1), new Date(1950, 1, 1)]},
+        {"name": "Modern", "timeRange": [new Date(1950, 1, 1), new Date(2022, 1, 1)]},
       ]
     }
 },
@@ -975,9 +1069,8 @@ mounted: function () {
     this.$parent.socket.on("set_color_pie", (data) => {
         this.pie_data.labels = data.colors;
         this.pie_data.datasets = [{
-            label: "Data One",
-            backgroundColor: data.colors,
-            data: data.percentages,
+          data: data.percentages,
+          backgroundColor: data.colors,
         }];
         this.fetched.col_generated = true;
         this.pie_key += 1;
@@ -986,7 +1079,6 @@ mounted: function () {
     this.$parent.socket.on("set_color_pie2", (data) => {
         this.pie_data2.labels = data.colors;
         this.pie_data2.datasets = [{
-            label: "Data One",
             backgroundColor: data.colors,
             data: data.percentages,
         }];
@@ -1073,7 +1165,6 @@ mounted: function () {
   }
 }
 </script>
-
 
 <style scoped>
   .slide-fade-enter-active {
