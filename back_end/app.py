@@ -47,18 +47,26 @@ CORS(app)
 socketio = SocketIO(app, cors_allowed_origins='*')
 
 WIKI_NAME_MAP = {
-    "eyck": "Jan van Eyck",
-    "vinci": "Leonardo da Vinci",
-    "bosch": "Jheronimus Bosch",
-    "hals": "Frans Hals",
-    "greco": "El Greco",
-    "dyck": "Anthony van Dyck",
-    "rijn": "Rembrandt",
-    "steen": "Jan Steen",
     "blake": "William Blake",
-    "turner": "J. M. W. Turner",
+    "bosch": "Hieronymus Bosch",
+    "caravaggio": "Michelangelo Merisi da Caravaggio",
+    "degas": "Edgar Degas",
     "delacroix": "Eugène Delacroix",
-    "gogh": "Vincent van Gogh"
+    "dyck": "Anthony van Dyck",
+    "eyck": "Jan van Eyck",
+    "greco": "Doménikos Theotokópoulos (El Greco)",
+    "gogh": "Vincent van Gogh",
+    "hals": "Frans Hals",
+    "ingres": "Jean-Auguste-Dominique Ingres",
+    "monet": "Oscar-Claude Monet",
+    "raphael": "Raffaello Sanzio da Urbino",
+    "renoir": "Pierre-Auguste Renoir",
+    "rijn": "Rembrandt van Rijn",
+    "rubens": "Peter Paul Rubens",
+    "steen": "Jan Steen",
+    "turner": "J. M. W. Turner",
+    "vermeer": "Johannes Vermeer",
+    "vinci": "Leonardo da Vinci",
 }
 
 
