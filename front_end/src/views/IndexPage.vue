@@ -739,8 +739,6 @@ methods: {
                                 });
                                 this.selected_artist = filters;
 
-                                // this.genre = filters[0];
-                                // this.genre2 = filters[1]
                                 this.$parent.socket.emit("collect_info", {
                                   type: "artists",
                                   compare_side: "left",
@@ -816,9 +814,9 @@ methods: {
 
                                 this.genre = filters[filters.length - 1];
                                 this.$parent.socket.emit("collect_info", {
-                                    compare_side: "left",
-                                    type: "artists",
-                                    class_idx: filters[filters.length - 1],
+                                  compare_side: "left",
+                                  type: "artists",
+                                  class_idx: filters[filters.length - 1],
                                 });
 
                                 this.$parent.socket.emit("generate_images", {
