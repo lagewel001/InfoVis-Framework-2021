@@ -4,55 +4,64 @@ from data import *;
   <div>
     <!-- Standard Mode -->
     <div v-if="!compare_mode" class="scale">
-        <vs-row> <vs-col type="flex" vs-justify="left" vs-align="left" vs-lg="6" vs-sm="6" vs-xs="12">
-                <transition mode="out-in" enter-active-class="animate__animated animate__fadeInLeft"
-                            leave-active-class="animate__animated animate__fadeOutRight">
-                    <vs-card class="cardx" v-if="fetched.img_existend">
-                        <div slot="header">
-                            <h3>Existing Art Pieces: {{ genre }}</h3>
-                        </div>
+        <vs-row>
+          <!-- Existing pieces -->
+          <vs-col type="flex" vs-justify="left" vs-align="left" vs-lg="6" vs-sm="6" vs-xs="12">
+            <transition
+              mode="out-in"
+              enter-active-class="animate__animated animate__fadeInLeft"
+              leave-active-class="animate__animated animate__fadeOutRight">
+              <vs-card class="cardx" v-if="fetched.img_existend">
+                <div slot="header">
+                  <h3>Existing Art Pieces: {{ genre }}</h3>
+                </div>
 
-                        <div slot="media">
-                            <carousel-3d>
-                                <slide v-for="(slide, i) in existend_imgs" :index="i" :key="i">
-                                    <template slot-scope="{ index, isCurrent, leftIndex, rightIndex }">
-                                        <img :data-index="index"
-                                             :class="{ current: isCurrent, onLeft: (leftIndex >= 0), onRight: (rightIndex >= 0) }"
-                                             :src="slide">
-                                    </template>
-                                </slide>
-                            </carousel-3d>
-                        </div>
-                    </vs-card>
-                </transition>
-            </vs-col>
+                <div slot="media">
+                  <carousel-3d>
+                    <slide v-for="(slide, i) in existend_imgs" :index="i" :key="i">
+                      <template slot-scope="{ index, isCurrent, leftIndex, rightIndex }">
+                        <img
+                          :data-index="index"
+                          :class="{ current: isCurrent, onLeft: (leftIndex >= 0), onRight: (rightIndex >= 0) }"
+                          :src="slide">
+                      </template>
+                    </slide>
+                  </carousel-3d>
+                </div>
+              </vs-card>
+            </transition>
+          </vs-col>
 
-            <vs-col type="flex" vs-justify="right" vs-align="right" vs-lg="6" vs-sm="6" vs-xs="12" class="mt-sm-0 mt-4">
-              <transition mode="out-in" enter-active-class="animate__animated animate__fadeInDown"
-                          leave-active-class="animate__animated animate__fadeOutUp">
-                <vs-card class="cardx" v-if="fetched.img_generated">
-                  <div slot="header">
-                      <h3>Generated Art Piece</h3>
-                  </div>
+          <!-- Generated pieces -->
+          <vs-col type="flex" vs-justify="right" vs-align="right" vs-lg="6" vs-sm="6" vs-xs="12">
+            <transition
+              mode="out-in"
+              enter-active-class="animate__animated animate__fadeInDown"
+              leave-active-class="animate__animated animate__fadeOutUp">
+              <vs-card class="cardx" v-if="fetched.img_generated">
+                <div slot="header">
+                    <h3>Generated Art Piece</h3>
+                </div>
 
-                  <div slot="media">
-                    <carousel-3d>
-                      <slide v-for="(slide, i) in generated_imgs" :index="i" :key="i">
-                        <template slot-scope="{ index, isCurrent, leftIndex, rightIndex }">
-                          <img
-                            :data-index="index"
-                            :class="{ current: isCurrent, onLeft: (leftIndex >= 0), onRight: (rightIndex >= 0) }"
-                            :src="slide">
-                        </template>
-                      </slide>
-                    </carousel-3d>
-                  </div>
-                </vs-card>
-              </transition>
-            </vs-col>
+                <div slot="media">
+                  <carousel-3d>
+                    <slide v-for="(slide, i) in generated_imgs" :index="i" :key="i">
+                      <template slot-scope="{ index, isCurrent, leftIndex, rightIndex }">
+                        <img
+                          :data-index="index"
+                          :class="{ current: isCurrent, onLeft: (leftIndex >= 0), onRight: (rightIndex >= 0) }"
+                          :src="slide">
+                      </template>
+                    </slide>
+                  </carousel-3d>
+                </div>
+              </vs-card>
+            </transition>
+          </vs-col>
         </vs-row>
 
-        <vs-row :class="fetched.col_generated ? '' : 'mt-4'">
+        <!-- Pie charts and wikipedia -->
+        <vs-row>
           <vs-col type="flex" vss-justify="left" vs-align="left" vs-lg="2" vs-sm="2" vs-xs="12">
             <vs-card class="cardx" v-if="donut_data[0].generated">
               <div slot="header"><h4>Colors in existing works</h4></div>
@@ -98,6 +107,7 @@ from data import *;
             </vs-col>
         </vs-row>
 
+        <!-- Histograms -->
         <vs-row>
              <vs-col type="flex" vs-justify="left" vs-align="left" vs-lg="6" vs-sm="6" vs-xs="12">
                 <transition mode="out-in" enter-active-class="animate__animated animate__fadeInUp"
