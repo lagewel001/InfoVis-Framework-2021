@@ -2,65 +2,91 @@ from data import *;
 
 <template>
   <div>
+    <!-- Standard Mode -->
     <div v-if="!compare_mode" class="scale">
-        <vs-row> <vs-col type="flex" vs-justify="left" vs-align="left" vs-lg="4" vs-sm="4" vs-xs="12">
-                <transition mode="out-in" enter-active-class="animate__animated animate__fadeInLeft"
-                            leave-active-class="animate__animated animate__fadeOutRight">
-                    <vs-card class="cardx" v-if="fetched.img_existend" fixedHeight vs-w="5">
-                        <div slot="header">
-                            <h3>Existing Art Pieces: {{ exist_artist }}</h3>
-                        </div>
+        <vs-row>
+          <!-- Existing pieces -->
+          <vs-col type="flex" vs-justify="left" vs-align="left" vs-lg="6" vs-sm="6" vs-xs="12">
+            <transition
+              mode="out-in"
+              enter-active-class="animate__animated animate__fadeInLeft"
+              leave-active-class="animate__animated animate__fadeOutRight">
+              <vs-card class="cardx" v-if="fetched.img_existend">
+                <div slot="header">
+                  <h3>Existing Art Pieces: {{ genre }}</h3>
+                </div>
 
-                        <div slot="media">
-                            <carousel-3d>
-                                <slide v-for="(slide, i) in existend_imgs" :index="i" :key="i">
-                                    <template slot-scope="{ index, isCurrent, leftIndex, rightIndex }">
-                                        <img :data-index="index"
-                                             :class="{ current: isCurrent, onLeft: (leftIndex >= 0), onRight: (rightIndex >= 0) }"
-                                             :src="slide">
-                                    </template>
-                                </slide>
-                            </carousel-3d>
-                        </div>
-                    </vs-card>
-                </transition>
-            </vs-col>
+                <div slot="media">
+                  <carousel-3d>
+                    <slide v-for="(slide, i) in existend_imgs" :index="i" :key="i">
+                      <template slot-scope="{ index, isCurrent, leftIndex, rightIndex }">
+                        <img
+                          :data-index="index"
+                          :class="{ current: isCurrent, onLeft: (leftIndex >= 0), onRight: (rightIndex >= 0) }"
+                          :src="slide">
+                      </template>
+                    </slide>
+                  </carousel-3d>
+                </div>
+              </vs-card>
+            </transition>
+          </vs-col>
 
-            <vs-col type="flex" vs-justify="right" vs-align="right" vs-lg="4" vs-sm="4" vs-xs="12" class="mt-sm-0 mt-4">
-                <transition mode="out-in" enter-active-class="animate__animated animate__fadeInDown"
-                            leave-active-class="animate__animated animate__fadeOutUp">
-                    <vs-card class="cardx" v-if="fetched.img_generated" fixedHeight vs-w="5">
-                        <div slot="header">
-                            <h3>Generated Art Piece</h3>
-                        </div>
+          <!-- Generated pieces -->
+          <vs-col type="flex" vs-justify="right" vs-align="right" vs-lg="6" vs-sm="6" vs-xs="12">
+            <transition
+              mode="out-in"
+              enter-active-class="animate__animated animate__fadeInDown"
+              leave-active-class="animate__animated animate__fadeOutUp">
+              <vs-card class="cardx" v-if="fetched.img_generated">
+                <div slot="header">
+                    <h3>Generated Art Piece</h3>
+                </div>
 
-                        <div slot="media" v-if="fetched.img_generated">
-                            <img v-bind:src="generated_img">
-                        </div>
-                    </vs-card>
-                </transition>
-            </vs-col>
-            <vs-col type="flex" vs-justify="right" vs-align="right"  vs-lg="4" vs-sm="4" vs-xs="12">
-                <transition mode="out-in" enter-active-class="animate__animated animate__fadeInRight"
-                            leave-active-class="animate__animated animate__fadeOutLeft">
-                    <vs-card class="cardx" v-if="fetched.col_generated">
-                        <div slot="header">
-                            <h4>Dominant colours in this painting</h4>
-                        </div>
-
-                        <div>
-                            <div id="app">
-                                <pie-chart :data="pie_data" :key="pie_key"></pie-chart>
-                            </div>
-                            <div id="my_dataviz"></div>
-                        </div>
-                    </vs-card>
-                </transition>
-            </vs-col>
+                <div slot="media">
+                  <carousel-3d>
+                    <slide v-for="(slide, i) in generated_imgs" :index="i" :key="i">
+                      <template slot-scope="{ index, isCurrent, leftIndex, rightIndex }">
+                        <img
+                          :data-index="index"
+                          :class="{ current: isCurrent, onLeft: (leftIndex >= 0), onRight: (rightIndex >= 0) }"
+                          :src="slide">
+                      </template>
+                    </slide>
+                  </carousel-3d>
+                </div>
+              </vs-card>
+            </transition>
+          </vs-col>
         </vs-row>
 
-        <vs-row :class="fetched.col_generated ? '' : 'mt-4'">
-            <vs-col type="flex" vs-justify="left" vs-align="left" vs-lg="6" vs-sm="6" vs-xs="12">
+        <!-- Pie charts and wikipedia -->
+        <vs-row>
+          <vs-col type="flex" vss-justify="left" vs-align="left" vs-lg="2" vs-sm="2" vs-xs="12">
+            <vs-card class="cardx" v-if="donut_data[0].generated">
+              <div slot="header"><h4>Colors in existing works</h4></div>
+              <div slot="media">
+                <pie-chart
+                  :data="donut_data[0]"
+                  :options="pie_options"
+                  :key="donut_data[0].key">
+                </pie-chart>
+              </div>
+            </vs-card>
+          </vs-col>
+          <vs-col type="flex" vss-justify="left" vs-align="left" vs-lg="2" vs-sm="2" vs-xs="12">
+            <vs-card class="cardx" v-if="donut_data[1].generated">
+              <div slot="header"><h4>Colors in generated works</h4></div>
+              <div slot="media">
+                <pie-chart
+                  :data="donut_data[1]"
+                  :options="pie_options"
+                  :key="donut_data[1].key">
+                </pie-chart>
+              </div>
+            </vs-card>
+          </vs-col>
+            <vs-col type="flex" vs-justify="left" vs-align="left" vs-lg="8" vs-sm="8" vs-xs="12">
                 <transition mode="out-in" enter-active-class="animate__animated animate__fadeInRight"
                             leave-active-class="animate__animated animate__fadeOutLeft">
                     <vs-card class="cardx" v-if="fetched.summary">
@@ -70,11 +96,8 @@ from data import *;
                         </div>
                     </vs-card>
                 </transition>
-            </vs-col>
-
-            <vs-col type="flex" vs-justify="right" vs-align="right" vs-lg="6" vs-sm="6" vs-xs="12">
                 <transition name="slide-fade">
-                    <vs-card class="cardx" v-if="fetched.related_terms">
+                    <vs-card class="cardx" v-if="fetched.related_terms" height="100%">
                         <div slot="header"><h4>Related terms</h4></div>
                         <div>
                             {{ related_terms }}
@@ -84,12 +107,13 @@ from data import *;
             </vs-col>
         </vs-row>
 
+        <!-- Histograms -->
         <vs-row>
              <vs-col type="flex" vs-justify="left" vs-align="left" vs-lg="6" vs-sm="6" vs-xs="12">
                 <transition mode="out-in" enter-active-class="animate__animated animate__fadeInUp"
                             leave-active-class="animate__animated animate__fadeOutDown">
                     <vs-card class="cardx" v-if="fetched.histograms">
-                        <div slot="header"><h3>Distribution of dominant colours: {{ selected_artist }}</h3></div>
+                        <div slot="header"><h3>Distribution of dominant colors: {{ genre }}</h3></div>
                         <zingchart
                                 ref="style_hist"
                                 :data="style_hist_data"
@@ -103,7 +127,7 @@ from data import *;
                 <transition mode="out-in" enter-active-class="animate__animated animate__fadeInRight"
                             leave-active-class="animate__animated animate__fadeOutLeft">
                     <vs-card class="cardx" v-if="fetched.line_chart">
-                        <div slot="header"><h3>Dominant colors over the years: {{ selected_artist }}</h3></div>
+                        <div slot="header"><h3>Dominant colors over the years: {{ genre }}</h3></div>
                         <zingchart
                                 ref="line_chart"
                                 :data="line_chart_data"
@@ -116,9 +140,9 @@ from data import *;
         </vs-row>
     </div>
 
-
-
+    <!-- Compare Mode -->
     <div v-if="compare_mode" class="scale">
+      <!-- -->
       <vs-row vs-justify="top">
         <vs-col type="flex" vs-justify="left" vs-align="left" vs-lg="6" vs-sm="6" vs-xs="12">
           <transition mode="out-in" enter-active-class="animate__animated animate__fadeInLeft"
@@ -126,7 +150,7 @@ from data import *;
             <vs-card class="cardx" style="border-style: solid; border-color:blue; border-width: thin;"
                      v-if="fetched.img_existend" fixedHeight vs-w="5">
                 <div slot="header">
-                    <h3>Existing Art Pieces: {{ exist_artist }}</h3>
+                    <h3>Existing Art Pieces: {{ genre }}</h3>
                 </div>
 
                 <div slot="media">
@@ -169,19 +193,27 @@ from data import *;
         </vs-col>
       </vs-row>
 
+      <!-- -->
       <vs-row class="mt-4 mb-4">
           <vs-col type="flex" vs-justify="left" vs-align="left" vs-lg="6" vs-sm="6" vs-xs="12">
               <transition mode="out-in" enter-active-class="animate__animated animate__fadeInDown"
                           leave-active-class="animate__animated animate__fadeOutUp">
                   <vs-card class="cardx" style="border-style: solid; border-color:blue; border-width: thin;"
-                           v-if="fetched.img_generated" fixedHeight vs-w="5">
-                      <div slot="header">
-                          <h3>Generated Art Piece</h3>
-                      </div>
-
-                      <div slot="media" v-if="fetched.img_generated">
-                          <img v-bind:src="generated_img">
-                      </div>
+                           v-if="fetched.img_generated">
+                    <div slot="header">
+                      <h3>Generated Art Piece</h3>
+                    </div>
+                    <div slot="media">
+                      <carousel-3d>
+                        <slide v-for="(slide, i) in generated_imgs" :index="i" :key="i">
+                          <template slot-scope="{ index, isCurrent, leftIndex, rightIndex }">
+                            <img :data-index="index"
+                                 :class="{ current: isCurrent, onLeft: (leftIndex >= 0), onRight: (rightIndex >= 0) }"
+                                 :src="slide">
+                          </template>
+                        </slide>
+                      </carousel-3d>
+                    </div>
                   </vs-card>
               </transition>
           </vs-col>
@@ -190,121 +222,170 @@ from data import *;
               <transition mode="out-in" enter-active-class="animate__animated animate__fadeInDown"
                           leave-active-class="animate__animated animate__fadeOutUp">
                   <vs-card class="cardx" style="border-style: solid; border-color:orange; border-width: thin;"
-                           v-if="fetched.img_generated" fixedHeight vs-w="5">
-                      <div slot="header">
-                          <h3>Generated Art Piece</h3>
-                      </div>
-
-                      <div slot="media" v-if="fetched.img_generated2">
-                          <img v-bind:src="generated_img2">
-                      </div>
+                           v-if="fetched.img_generated">
+                    <div slot="header">
+                      <h3>Generated Art Piece</h3>
+                    </div>
+                    <div slot="media">
+                      <carousel-3d>
+                        <slide v-for="(slide, i) in generated_imgs2" :index="i" :key="i">
+                          <template slot-scope="{ index, isCurrent, leftIndex, rightIndex }">
+                            <img :data-index="index"
+                                 :class="{ current: isCurrent, onLeft: (leftIndex >= 0), onRight: (rightIndex >= 0) }"
+                                 :src="slide">
+                          </template>
+                        </slide>
+                      </carousel-3d>
+                    </div>
                   </vs-card>
               </transition>
           </vs-col>
       </vs-row>
 
+      <!-- Wikipedia and piecharts -->
       <vs-row vs-justify='top'>
+          <!-- Left artist -->
           <vs-col type="flex" vs-lg="6" vs-sm="6" vs-xs="12">
-              <vs-row>
-                  <vs-col type="flex" vs-justify="flex-start" vs-lg="6" vs-sm="6" vs-xs="12" class="pl-0">
-                          <transition mode="out-in" enter-active-class="animate__animated animate__fadeInRight"
-                                      leave-active-class="animate__animated animate__fadeOutLeft">
-                              <vs-card class="cardx"
-                                       style="border-style: solid; border-color:blue; border-width: thin;"
-                                       v-if="fetched.summary">
-                                  <div slot="header"><h4>{{ genre }} on Wikipedia</h4></div>
-                                  <div style="font-size: 11pt">
-                                      {{ summary }}
-                                  </div>
-                              </vs-card>
-                          </transition>
-                  </vs-col>
-
-                  <vs-col type="flex" vs-justify="flex-end" vs-lg="6" vs-sm="6" vs-xs="12" class="pr-0">
-                      <transition name="slide-fade">
-                          <vs-card class="cardx"
-                                   style="border-style: solid; border-color:blue; border-width: thin;"
-                                   v-if="fetched.related_terms">
-                              <div slot="header"><h4>Related terms {{ genre }} </h4></div>
-                              <div>
-                                  {{ related_terms }}
-                              </div>
-                          </vs-card>
-                      </transition>
-                  </vs-col>
-
-                  <vs-col vs-w="12">
-                      <transition mode="out-in" enter-active-class="animate__animated animate__fadeInRight"
-                          leave-active-class="animate__animated animate__fadeOutLeft">
-                          <vs-card class="cardx" style="border-style: solid; border-color:blue; border-width: thin;"
-                                   v-if="fetched.col_generated">
-                              <div slot="header"><h4>Dominant colours in this painting</h4></div>
-                              <div>
-                                  <div id="app">
-                                      <pie-chart :data="pie_data" :key="pie_key"></pie-chart>
-                                  </div>
-                                  <div id="my_dataviz"></div>
-                              </div>
-                          </vs-card>
-                      </transition>
-                  </vs-col>
-              </vs-row>
+            <vs-row>
+              <vs-col type="flex" vs-justify="flex-start" vs-lg="4" vs-sm="4" vs-xs="12" class="pl-0">
+                <transition
+                  mode="out-in"
+                  enter-active-class="animate__animated animate__fadeInRight"
+                  leave-active-class="animate__animated animate__fadeOutLeft">
+                  <vs-card
+                    class="cardx"
+                    style="border-style: solid; border-color:blue; border-width: thin;"
+                    v-if="donut_data[0].generated">
+                    <div slot="header"><h4>Colors in existing works</h4></div>
+                    <div slot="media">
+                      <pie-chart
+                        :data="donut_data[0]"
+                        :options="pie_options"
+                        :key="donut_data[0].key">
+                      </pie-chart>
+                    </div>
+                  </vs-card>
+                </transition>
+                <transition
+                  mode="out-in"
+                  enter-active-class="animate__animated animate__fadeInRight"
+                  leave-active-class="animate__animated animate__fadeOutLeft">
+                  <vs-card
+                    class="cardx"
+                    style="border-style: solid; border-color:blue; border-width: thin;"
+                    v-if="donut_data[1].generated">
+                    <div slot="header"><h4>Colors in generated works</h4></div>
+                    <div slot="media">
+                      <pie-chart
+                        :data="donut_data[1]"
+                        :options="pie_options"
+                        :key="donut_data[1].key">
+                      </pie-chart>
+                    </div>
+                  </vs-card>
+                </transition>
+              </vs-col>
+              <vs-col type="flex" vs-justify="flex-start" vs-lg="8" vs-sm="8" vs-xs="12" class="pl-0">
+                <transition mode="out-in" enter-active-class="animate__animated animate__fadeInRight"
+                            leave-active-class="animate__animated animate__fadeOutLeft">
+                  <vs-card class="cardx"
+                           style="border-style: solid; border-color:blue; border-width: thin;"
+                           v-if="fetched.summary">
+                    <div slot="header"><h4>{{ genre }} on Wikipedia</h4></div>
+                    <div style="font-size: 11pt">
+                        {{ summary }}
+                    </div>
+                  </vs-card>
+                </transition>
+                <transition name="slide-fade">
+                  <vs-card class="cardx"
+                           style="border-style: solid; border-color:blue; border-width: thin;"
+                           v-if="fetched.related_terms">
+                    <div slot="header"><h4>Related terms {{ genre }} </h4></div>
+                    <div>
+                      {{ related_terms }}
+                    </div>
+                  </vs-card>
+                </transition>
+              </vs-col>
+            </vs-row>
           </vs-col>
 
-          <vs-col type="flex" vs-justify="right" vs-align="right" vs-lg="6" vs-sm="6" vs-xs="12">
-              <vs-row>
-                  <vs-col type="flex" vs-justify="flex-start" vs-lg="6" vs-sm="6" vs-xs="12" class="pl-0">
-                      <transition mode="out-in" enter-active-class="animate__animated animate__fadeInRight"
-                                  leave-active-class="animate__animated animate__fadeOutLeft">
-                          <vs-card class="cardx"
-                                   style="border-style: solid; border-color:orange; border-width: thin;"
-                                   v-if="fetched.summary2">
-                              <div slot="header"><h4>{{ genre2 }} on Wikipedia</h4></div>
-                              <div style="font-size: 11pt">
-                                  {{ summary2 }}
-                              </div>
-                          </vs-card>
-                      </transition>
-                  </vs-col>
-
-                  <vs-col type="flex" vs-justify="flex-end" vs-lg="6" vs-sm="6" vs-xs="12" class="pr-0">
-                      <transition name="slide-fade">
-                          <vs-card class="cardx"
-                                   style="border-style: solid; border-color:orange; border-width: thin;"
-                                   v-if="fetched.related_terms2">
-                              <div slot="header"><h4>Related terms {{ genre2 }}</h4></div>
-                              <div>
-                                  {{ related_terms2 }}
-                              </div>
-                          </vs-card>
-                      </transition>
-                  </vs-col>
-
-                  <vs-col vs-w="12">
-                      <transition mode="out-in" enter-active-class="animate__animated animate__fadeInRight"
-                          leave-active-class="animate__animated animate__fadeOutLeft">
-                          <vs-card class="cardx" style="border-style: solid; border-color:orange; border-width: thin;"
-                                   v-if="fetched.col_generated2">
-                              <div slot="header"><h4>Dominant colours in this painting</h4></div>
-                              <div>
-                                  <div id="app">
-                                      <pie-chart :data="pie_data2" :key="pie_key2"></pie-chart>
-                                  </div>
-                                  <div id="my_dataviz"></div>
-                              </div>
-                          </vs-card>
-                      </transition>
-                  </vs-col>
-              </vs-row>
+          <!-- Right artist -->
+          <vs-col type="flex" vs-lg="6" vs-sm="6" vs-xs="12">
+            <vs-row>
+              <vs-col type="flex" vs-justify="flex-start" vs-lg="4" vs-sm="4" vs-xs="12" class="pl-0">
+                <transition
+                  mode="out-in"
+                  enter-active-class="animate__animated animate__fadeInRight"
+                  leave-active-class="animate__animated animate__fadeOutLeft">
+                  <vs-card
+                    class="cardx"
+                    style="border-style: solid; border-color:blue; border-width: thin;"
+                    v-if="donut_data[2].generated">
+                    <div slot="header"><h4>Colors in existing works</h4></div>
+                    <div slot="media">
+                      <pie-chart
+                        :data="donut_data[2]"
+                        :options="pie_options"
+                        :key="donut_data[2].key">
+                      </pie-chart>
+                    </div>
+                  </vs-card>
+                </transition>
+                <transition
+                  mode="out-in"
+                  enter-active-class="animate__animated animate__fadeInRight"
+                  leave-active-class="animate__animated animate__fadeOutLeft">
+                  <vs-card
+                    class="cardx"
+                    style="border-style: solid; border-color:blue; border-width: thin;"
+                    v-if="donut_data[3].generated">
+                    <div slot="header"><h4>Colors in generated works</h4></div>
+                    <div slot="media">
+                      <pie-chart
+                        :data="donut_data[3]"
+                        :options="pie_options"
+                        :key="donut_data[3].key">
+                      </pie-chart>
+                    </div>
+                  </vs-card>
+                </transition>
+              </vs-col>
+              <vs-col type="flex" vs-justify="flex-start" vs-lg="8" vs-sm="8" vs-xs="12" class="pl-0">
+                <transition mode="out-in" enter-active-class="animate__animated animate__fadeInRight"
+                            leave-active-class="animate__animated animate__fadeOutLeft">
+                  <vs-card class="cardx"
+                           style="border-style: solid; border-color:blue; border-width: thin;"
+                           v-if="fetched.summary">
+                    <div slot="header"><h4>{{ genre2 }} on Wikipedia</h4></div>
+                    <div style="font-size: 11pt">
+                        {{ summary2 }}
+                    </div>
+                  </vs-card>
+                </transition>
+                <transition name="slide-fade">
+                  <vs-card class="cardx"
+                           style="border-style: solid; border-color:blue; border-width: thin;"
+                           v-if="fetched.related_terms">
+                    <div slot="header"><h4>Related terms {{ genre2 }} </h4></div>
+                    <div>
+                      {{ related_terms2 }}
+                    </div>
+                  </vs-card>
+                </transition>
+              </vs-col>
+            </vs-row>
           </vs-col>
       </vs-row>
 
+      <!-- Charts -->
       <vs-row vs-justify='top'>
           <vs-col type="flex" vs-justify="left" vs-align="left" vs-lg="6" vs-sm="6" vs-xs="12">
               <transition mode="out-in" enter-active-class="animate__animated animate__fadeInUp"
                           leave-active-class="animate__animated animate__fadeOutDown">
                   <vs-card class="cardx" v-if="fetched.histograms">
-                      <div slot="header"><h3>Distribution of dominant colours: {{ selected_artist }}</h3></div>
+                      <div slot="header"><h3>Distribution of dominant Colors: {{ selected_artist }}</h3></div>
                       <zingchart ref="style_hist" :data="style_hist_data" :key="hist_key"></zingchart>
                   </vs-card>
               </transition>
@@ -314,7 +395,7 @@ from data import *;
               <transition mode="out-in" enter-active-class="animate__animated animate__fadeInRight"
                           leave-active-class="animate__animated animate__fadeOutLeft">
                   <vs-card class="cardx" v-if="fetched.line_chart">
-                      <div slot="header"><h3>Dominant colours over the years: {{ selected_artist }}</h3></div>
+                      <div slot="header"><h3>Dominant Colors over the years: {{ selected_artist }}</h3></div>
                       <zingchart
                               ref="line_chart"
                               :data="line_chart_data"
@@ -327,6 +408,7 @@ from data import *;
       </vs-row>
     </div>
 
+    <!-- Timeline -->
     <vs-row>
         <vs-col type="flex" vs-justify="left" vs-align="left" id="timeline-card" :vs-w="12">
             <transition name="slide-fade">
@@ -473,29 +555,47 @@ export default {
             // y: "68%",
         }
       },
+      pie_options: {
+        responsive: true,
+        aspectRatio: 1,
+        legend: { display: false },
+      },
+      donut_data: [
+        {
+          labels: [],
+          datasets: [],
+          key: 0,
+        },
+        {
+          labels: [],
+          datasets: [],
+          key: 0,
+        },
+        {
+          labels: [],
+          datasets: [],
+          key: 0,
+        },
+        {
+          labels: [],
+          datasets: [],
+          key: 0,
+        },
+      ],
       pie_data: {
-        hoverBackgroundColor: "blue",
-        hoverBorderWidth: 10,
         labels: ["#e5856d", "#5e2812", "#e56b18", "#f6bab7", "#973f28"],
-        datasets: [
-            {
-                label: "Data One",
-                backgroundColor: ["#e5856d", "#5e2812", "#e56b18", "#f6bab7", "#973f28"],
-                data: [0.27, 0.14, 0.16, 0.22, 0.21]
-            }
-        ]
+        datasets: [{
+          backgroundColor: ["#e5856d", "#5e2812", "#e56b18", "#f6bab7", "#973f28"],
+          data: [0.27, 0.14, 0.16, 0.22, 0.21],
+        }]
       },
       pie_data2: {
-        hoverBackgroundColor: "blue",
-        hoverBorderWidth: 10,
         labels: ["#e5856d", "#5e2812", "#e56b18", "#f6bab7", "#973f28"],
-        datasets: [
-            {
-                label: "Data One",
-                backgroundColor: ["#e5856d", "#5e2812", "#e56b18", "#f6bab7", "#973f28"],
-                data: [0.27, 0.14, 0.16, 0.22, 0.21]
-            }
-        ]
+        datasets: [{
+          label: "Data One",
+          backgroundColor: ["#e5856d", "#5e2812", "#e56b18", "#f6bab7", "#973f28"],
+          data: [0.27, 0.14, 0.16, 0.22, 0.21]
+        }]
       },
       style_hist_data: {
         type: 'hbar',
@@ -565,22 +665,22 @@ export default {
       artists_on_timeline: [],
       pending_remove_artists: [],
       artPeriods: [
-          {"name": "Medieval", "timeRange": [new Date(500, 1, 1), new Date(1400, 1, 1)]},
-          {"name": "Renaissance", "timeRange": [new Date(1400, 1, 1), new Date(1500, 1, 1)]},
-          {"name": "Mannerism", "timeRange": [new Date(1527, 1, 1), new Date(1580, 1, 1)]},
-          {"name": "Baroque", "timeRange": [new Date(1600, 1, 1), new Date(1750, 1, 1)]},
-          {"name": "Rococo", "timeRange": [new Date(1699, 1, 1), new Date(1780, 1, 1)]},
-          {"name": "Neoclassicism", "timeRange": [new Date(1750, 1, 1), new Date(1850, 1, 1)]},
-          {"name": "Romanticism", "timeRange": [new Date(1780, 1, 1), new Date(1850, 1, 1)]},
-          {"name": "Realism", "timeRange": [new Date(1848, 1, 1), new Date(1900, 1, 1)]},
-          {"name": "Art Nouveau", "timeRange": [new Date(1890, 1, 1), new Date(1910, 1, 1)]},
-          {"name": "Impressionism", "timeRange": [new Date(1865, 1, 1), new Date(1885, 1, 1)]},
-          {"name": "Post-impressionism", "timeRange": [new Date(1885, 1, 1), new Date(1910, 1, 1)]},
-          {"name": "Fauvism", "timeRange": [new Date(1900, 1, 1), new Date(1935, 1, 1)]},
-          {"name": "Expressionism", "timeRange": [new Date(1905, 1, 1), new Date(1920, 1, 1)]},
-          {"name": "Cubism", "timeRange": [new Date(1907, 1, 1), new Date(1914, 1, 1)]},
-          {"name": "Surrealism", "timeRange": [new Date(1917, 1, 1), new Date(1950, 1, 1)]},
-          {"name": "Modern", "timeRange": [new Date(1950, 1, 1), new Date(2022, 1, 1)]},
+        {"name": "Medieval", "timeRange": [new Date(500, 1, 1), new Date(1400, 1, 1)]},
+        {"name": "Renaissance", "timeRange": [new Date(1400, 1, 1), new Date(1500, 1, 1)]},
+        {"name": "Mannerism", "timeRange": [new Date(1527, 1, 1), new Date(1580, 1, 1)]},
+        {"name": "Baroque", "timeRange": [new Date(1600, 1, 1), new Date(1750, 1, 1)]},
+        {"name": "Rococo", "timeRange": [new Date(1699, 1, 1), new Date(1780, 1, 1)]},
+        {"name": "Neoclassicism", "timeRange": [new Date(1750, 1, 1), new Date(1850, 1, 1)]},
+        {"name": "Romanticism", "timeRange": [new Date(1780, 1, 1), new Date(1850, 1, 1)]},
+        {"name": "Realism", "timeRange": [new Date(1848, 1, 1), new Date(1900, 1, 1)]},
+        {"name": "Art Nouveau", "timeRange": [new Date(1890, 1, 1), new Date(1910, 1, 1)]},
+        {"name": "Impressionism", "timeRange": [new Date(1865, 1, 1), new Date(1885, 1, 1)]},
+        {"name": "Post-impressionism", "timeRange": [new Date(1885, 1, 1), new Date(1910, 1, 1)]},
+        {"name": "Fauvism", "timeRange": [new Date(1900, 1, 1), new Date(1935, 1, 1)]},
+        {"name": "Expressionism", "timeRange": [new Date(1905, 1, 1), new Date(1920, 1, 1)]},
+        {"name": "Cubism", "timeRange": [new Date(1907, 1, 1), new Date(1914, 1, 1)]},
+        {"name": "Surrealism", "timeRange": [new Date(1917, 1, 1), new Date(1950, 1, 1)]},
+        {"name": "Modern", "timeRange": [new Date(1950, 1, 1), new Date(2022, 1, 1)]},
       ]
     }
 },
@@ -649,23 +749,28 @@ methods: {
                                 });
                                 this.selected_artist = filters;
 
-                                // this.genre = filters[0];
-                                // this.genre2 = filters[1]
                                 this.$parent.socket.emit("collect_info", {
-                                    type: "artists",
-                                    compare: true,
-                                    amount: 1,
-                                    // class_idx: filters[filters.length - 1],
-                                    class_idx: filters[0],
-                                    class_idx2: filters[1],
+                                  type: "artists",
+                                  compare_side: "left",
+                                  class_idx: filters[0],
+                                });
+                                this.$parent.socket.emit("collect_info", {
+                                  type: "artists",
+                                  compare_side: "right",
+                                  class_idx: filters[1],
                                 });
 
                                 this.$parent.socket.emit("generate_images", {
                                     type: "artists",
-                                    compare: true,
-                                    amount: 1,
+                                    compare_side: "left",
+                                    amount: 7,
                                     class_idx: filters[0],
-                                    class_idx2: filters[1],
+                                });
+                                this.$parent.socket.emit("generate_images", {
+                                    type: "artists",
+                                    compare_side: "right",
+                                    amount: 7,
+                                    class_idx: filters[1],
                                 });
 
                                 // Select specific filters
@@ -719,19 +824,16 @@ methods: {
 
                                 this.genre = filters[filters.length - 1];
                                 this.$parent.socket.emit("collect_info", {
-                                    compare: false,
-                                    type: "artists",
-                                    amount: 1,
-                                    class_idx: filters[filters.length - 1],
-                                    class_idx2: false
+                                  compare_side: "left",
+                                  type: "artists",
+                                  class_idx: filters[filters.length - 1],
                                 });
 
                                 this.$parent.socket.emit("generate_images", {
-                                    compare: false,
+                                    compare_side: "left",
                                     type: "artists",
-                                    amount: 1,
+                                    amount: 7,
                                     class_idx: filters[filters.length - 1],
-                                    class_idx2: false
                                 });
 
                                 // Select specific filters
@@ -790,19 +892,16 @@ methods: {
                             type: "centuries",
                         });
                         this.$parent.socket.emit("collect_info", {
-                            compare: false,
+                            compare_side: "left",
                             type: "centuries",
-                            amount: 1,
                             class_idx: Math.round(avg_year),
-                            class_idx2: false,
                         });
 
                         this.$parent.socket.emit("generate_images", {
-                            compare: false,
+                            compare_side: "left",
                             type: "centuries",
-                            amount: 1,
+                            amount: 7,
                             class_idx: century,
-                            class_idx2: false,
                         });
                     }
                     if (this.compare_mode) {
@@ -816,19 +915,28 @@ methods: {
                         });
                         this.genre2 = century2
                         this.$parent.socket.emit("collect_info", {
-                            compare: true,
+                            compare_side: "left",
                             type: "centuries",
-                            amount: 1,
                             class_idx: Math.round(avg_year),
-                            class_idx2: century2,
+                        });
+                        this.$parent.socket.emit("collect_info", {
+                            compare_side: "right",
+                            type: "centuries",
+                            class_idx: century2,
                         });
 
                         this.$parent.socket.emit("generate_images", {
-                            compare: true,
+                            compare_side: "left",
                             type: "centuries",
-                            amount: 1,
+                            amount: 7,
                             class_idx: century,
-                            class_idx2: century2,
+                        });
+
+                        this.$parent.socket.emit("generate_images", {
+                            compare_side: "right",
+                            type: "centuries",
+                            amount: 7,
+                            class_idx: century2,
                         });
                     }
                 })
@@ -841,37 +949,43 @@ methods: {
 
                     if (!this.compare_mode) {
                         this.$parent.socket.emit("collect_info", {
-                            compare: false,
+                            compare_side: "left",
                             type: "artists",
-                            amount: 1,
                             class_idx: s.val,
-                            class_idx2: false,
                         });
 
                         this.$parent.socket.emit("generate_images", {
-                            compare: false,
+                            compare_side: "left",
                             type: "artists",
-                            amount: 1,
+                            amount: 7,
                             class_idx: s.val,
-                            class_idx2: false,
                         });
                     }
                     if (this.compare_mode) {
                         this.genre2 = s.val2
                         this.$parent.socket.emit("collect_info", {
-                            compare: true,
+                            compare_side: "left",
                             type: "artists",
-                            amount: 1,
                             class_idx: s.val,
-                            class_idx2: s.val2,
+                        });
+                        this.$parent.socket.emit("collect_info", {
+                            compare_side: "right",
+                            type: "artists",
+                            class_idx: s.val2,
                         });
 
+                        console.log("Generating artists images for comparison");
                         this.$parent.socket.emit("generate_images", {
-                            compare: true,
+                            compare_side: "left",
                             type: "artists",
-                            amount: 1,
+                            amount: 7,
                             class_idx: s.val,
-                            class_idx2: s.val2,
+                        });
+                        this.$parent.socket.emit("generate_images", {
+                            compare_side: "right",
+                            type: "artists",
+                            amount: 7,
+                            class_idx: s.val2,
                         });
                     }
                 })(container);
@@ -928,68 +1042,62 @@ methods: {
         );
         return data;
     },
+    set_color_pie(index, colors, values) {
+      this.donut_data[index].labels = colors;
+      this.donut_data[index].datasets = [{
+        data: values,
+        backgroundColor: colors,
+      }];
+      this.donut_data[index].generated = true;
+      this.donut_data[index].key += 1;
+    }
 },
 async created() {
     this.$parent.socket.emit("get_all_artists", (all_artists) => this.all_artists = all_artists);
 },
 mounted: function () {
     this.$parent.socket.on("set_image", (data) => {
-        window.scroll({top: 0, left: 0, behaviour: 'smooth'});
+      window.scroll({top: 0, left: 0, behaviour: 'smooth'});
+
+      if (data.compare_side == "left") {
         this.existend_imgs = data.existend_imgs;
         this.exist_title = data.title;
         this.exist_artist = data.artist;
         this.exist_year = data.year;
         this.fetched.img_existend = true;
 
-        if (this.compare) {
-            this.existend_imgs2 = data.existend_imgs2;
-            this.exist_title2 = data.title2;
-            this.exist_artist2 = data.artist2;
-            this.exist_year2 = data.year2;
-            this.fetched.img_existend2 = true;
-        }
-    });
+        this.set_color_pie(0, data.colors.color_palette, data.colors.color_distribution);
+      } else if (this.compare) {
+        this.existend_imgs2 = data.existend_imgs;
+        this.exist_title2 = data.title;
+        this.exist_artist2 = data.artist;
+        this.exist_year2 = data.year;
+        this.fetched.img_existend2 = true;
 
-    this.$parent.socket.on("set_color_pie", (data) => {
-        this.pie_data.labels = data.colors;
-        this.pie_data.datasets = [{
-            label: "Data One",
-            backgroundColor: data.colors,
-            data: data.percentages,
-        }];
-        this.fetched.col_generated = true;
-        this.pie_key += 1;
-    });
-
-    this.$parent.socket.on("set_color_pie2", (data) => {
-        this.pie_data2.labels = data.colors;
-        this.pie_data2.datasets = [{
-            label: "Data One",
-            backgroundColor: data.colors,
-            data: data.percentages,
-        }];
-        this.fetched.col_generated2 = true;
-        this.pie_key2 += 1;
+        this.set_color_pie(2, data.colors.color_palette, data.colors.color_distribution);
+      }
     });
 
     this.$parent.socket.on("get_style_hists", (data) => {
-        this.style_hist_data.series = data.series;
-        this.fetched.histograms = true;
-        this.hist_key += 1;
+      this.style_hist_data.series = data.series;
+      this.fetched.histograms = true;
+      this.hist_key += 1;
     });
 
     this.$parent.socket.on("get_summary", (data) => {
-      this.genre = data.genre;
-      this.summary = data.summary;
-      this.fetched.summary = true;
-      this.related_terms = data.related_terms;
-      this.fetched.related_terms = true;
-      if (this.compare) {
-          this.genre2 = data.genre2;
-          this.summary2 = data.summary2;
-          this.fetched.summary2 = true;
-          this.related_terms2 = data.related_terms2;
-          this.fetched.related_terms2 = true;
+      console.log("Received summary for ", data);
+      if (data.compare_side == "left") {
+        this.genre = data.genre;
+        this.summary = data.summary;
+        this.fetched.summary = true;
+        this.related_terms = data.related_terms;
+        this.fetched.related_terms = true;
+      } else if (this.compare) {
+        this.genre2 = data.genre;
+        this.summary2 = data.summary;
+        this.fetched.summary2 = true;
+        this.related_terms2 = data.related_terms;
+        this.fetched.related_terms2 = true;
       }
     });
 
@@ -999,10 +1107,8 @@ mounted: function () {
     // });
 
     this.$parent.socket.on("collect_scatter_data", (data) => {
-      console.log(data);
       this.line_chart_data.series = data.series;
       this.line_chart_data.plot.marker = data.plot.marker;
-      console.log(this.line_chart_data);
       this.fetched.line_chart = true;
       this.chart_key += 1;
       // if(this.compare) {
@@ -1017,17 +1123,30 @@ mounted: function () {
     this.$parent.socket.on("images_generated", (data) => {
         console.log("Received generated image", data);
         if (data.success) {
-            this.generated_img = data.images[0].image;
-            if (this.compare) {
-                this.generated_img2 = data.images2[0].image;
-                this.fetched.img_generated2 = true;
-            }
+          var images = [];
+          data.images.forEach(image => {images.push(image.image)});
+          var first = data.images[0];
+
+          if (data.compare_side == "left") {
+            this.generated_imgs = images;
+            this.fetched.img_generated = true;
+
+            this.set_color_pie(1, first.color_palette, first.color_distribution);
+          } else if (this.compare) {
+            this.generated_imgs2 = images;
+            this.fetched.img_generated2 = true;
+
+            this.set_color_pie(3, first.color_palette, first.color_distribution);
+          }
+
+          this.$parent.set_main_color(first.dominant_color);
         } else {
-            this.generated_img = "@/assets/images/big/img1.jpg";
-            if (this.compare) {
-                this.generated_img2 = "@/assets/images/big/img1.jpg";
-                this.fetched.img_generated2 = true;
-            }
+          this.generated_imgs = ["@/assets/images/big/img1.jpg"];
+
+          if (this.compare) {
+            this.generated_imgs2 = ["@/assets/images/big/img1.jpg"];
+            this.fetched.img_generated2 = true;
+          }
         }
         this.fetched.img_generated = true;
     });
@@ -1045,7 +1164,6 @@ mounted: function () {
   }
 }
 </script>
-
 
 <style scoped>
   .slide-fade-enter-active {
